@@ -72,3 +72,6 @@ dist
 
 # Serverless directories
 .serverless
+
+#config files
+/config.js
