@@ -4,11 +4,13 @@
   "description": "obscura backend ",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV='dev' babel-node ./node_modules/.bin/gulp"
+    "dev": "NODE_ENV='dev' babel-node ./node_modules/.bin/gulp",
+    "prod": "NODE_ENV='dev' babel-node ./node_modules/.bin/gulp"
   },
   "author": "phoenix",
   "license": "MIT",
   "dependencies": {
+    "app-root-path": "^2.1.0",
     "babel-register": "^6.26.0",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
@@ -16,8 +18,11 @@
     "gulp-livereload": "^3.8.1",
     "gulp-notify": "^3.2.0",
     "mongoose": "^5.2.5",
+    "morgan": "^1.9.0",
     "node-fetch": "^2.2.0",
-    "nodemon": "^1.18.3"
+    "nodemon": "^1.18.3",
+    "winston": "^3.0.0",
+    "winston-daily-rotate-file": "^3.3.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

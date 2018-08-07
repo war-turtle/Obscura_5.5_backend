@@ -1,11 +1,18 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import morgan from 'morgan';
 import config from '../config';
+import {
+  stream, logger,
+} from '../log';
 
 
 const app = express();
 
+app.use(morgan('combined', {
+  stream,
+}));
 app.use(cors());
 app.use(bodyParser.urlencoded({
   extended: true,
@@ -20,3 +27,4 @@ app.use((req, res) => {
 });
 
 app.listen(config.app.port);
+// https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api
