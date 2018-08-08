@@ -7,27 +7,20 @@ import mongoose from 'mongoose';
  *     properties:
  *       name:
  *         type: string
- *         required: true
  *       email:
  *         type: string
- *         required: true
- *         unique: true
  *       team_id:
  *         type: string
  *       avatar:
- *         type: array
+ *         type: string
  *       username:
  *         type: string
- *         required: true
- *         unique: true
  *       phone:
- *         type: string
- *         required: true
- *         unique: true
+ *         type: number
  *       created_at:
- *         type: date
+ *         type: date-time
  *       updated_at:
- *         type: date
+ *         type: date-time
  */
 
 const PlayerSchema = mongoose.Schema({
@@ -44,9 +37,7 @@ const PlayerSchema = mongoose.Schema({
 
   team_id: String,
 
-  avatar: [{
-    type: String,
-  }],
+  avatar: String,
 
   username: {
     type: String,

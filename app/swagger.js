@@ -17,7 +17,7 @@ const swagger = (app) => {
     // import swaggerDefinitions
     swaggerDefinition,
     // path to the API docs
-    apis: ['./**/**/routes.js', 'routes.js', './**/**/models/*'],
+    apis: ['./**/**/routes/*/*', './**/**/models/*'],
   };
 
   // initialize swagger-jsdoc
