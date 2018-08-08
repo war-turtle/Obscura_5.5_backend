@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import Service from 'app/helper/Service';
-import ResponseTemplate from 'app/global/templates/response';
+import ResponseTemplate from '../templates/response';
 import configServer from '../../config/server';
 
 const ValidAuthToken = (req, res, next) => {

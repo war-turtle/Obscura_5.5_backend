@@ -1,4 +1,4 @@
-import ResponseTemplate from 'app/global/templates/response';
+import ResponseTemplate from '../templates/response';
 
 const EmptyContent = (req, res, next) => {
   if (req.method === 'POST' && Object.keys(req.body).length === 0) {

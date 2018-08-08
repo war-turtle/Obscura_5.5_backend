@@ -1,4 +1,4 @@
-import ResponseTemplate from 'app/global/templates/response';
+import ResponseTemplate from '../templates/response';
 
 const ContentType = (req, res, next) => {
   if (req.method === 'POST') {

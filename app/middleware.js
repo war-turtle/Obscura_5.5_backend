@@ -1,15 +1,12 @@
 // Middleware for Application
-import ContentTypeMiddleware from 'app/global/middlewares/ContentType';
-import EmptyContentMiddleware from 'app/global/middlewares/EmptyContent';
-import DelayResponseMiddleware from 'app/global/middlewares/DelayResponse';
-import LocationMiddleware from 'app/global/middlewares/LocationMiddleware';
-import CsrfMiddleware from 'app/global/middlewares/csrfMiddleware';
-
 import passport from 'passport';
 import bodyParser from 'body-parser';
 import expressSession from 'express-session';
 import cors from 'cors';
 import helmet from 'helmet';
+import CsrfMiddleware from './global/middlewares/csrfMidlleware';
+import EmptyContentMiddleware from './global/middlewares/EmptyContent';
+import ContentTypeMiddleware from './global/middlewares/ContentType';
 import configServer from './config/server';
 
 const middleware = (app) => {
@@ -29,6 +26,8 @@ const middleware = (app) => {
   app.use(expressSession({
     name: 'SESS_ID',
     secret: configServer.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
   }));
   app.use(bodyParser.urlencoded({
     extended: false,
@@ -43,7 +42,6 @@ const middleware = (app) => {
   }));
   app.use(ContentTypeMiddleware);
   app.use(EmptyContentMiddleware);
-  app.use(LocationMiddleware);
   app.use(CsrfMiddleware);
 };
 
