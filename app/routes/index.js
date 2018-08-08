@@ -1,8 +1,8 @@
 import express from 'express';
-import players from './players';
-import teams from './teams';
-import levels from './levels';
-import auth from './auth';
+import players from './players/players';
+import teams from './teams/teams';
+import levels from './levels/levels';
+import auth from './auth/auth';
 
 const router = express.Router();
 
