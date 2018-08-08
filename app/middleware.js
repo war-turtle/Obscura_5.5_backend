@@ -4,10 +4,12 @@ import bodyParser from 'body-parser';
 import expressSession from 'express-session';
 import cors from 'cors';
 import helmet from 'helmet';
+import morgan from 'morgan';
 import CsrfMiddleware from './global/middlewares/csrfMidlleware';
 import EmptyContentMiddleware from './global/middlewares/EmptyContent';
 import ContentTypeMiddleware from './global/middlewares/ContentType';
 import configServer from './config/server';
+import { stream } from '../log';
 
 const middleware = (app) => {
   app.use(passport.initialize());
@@ -39,6 +41,9 @@ const middleware = (app) => {
   // register all custom Middleware
   app.use(cors({
     optionsSuccessStatus: 200,
+  }));
+  app.use(morgan('combined', {
+    stream,
   }));
   app.use(ContentTypeMiddleware);
   app.use(EmptyContentMiddleware);
