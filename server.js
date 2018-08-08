@@ -22,5 +22,5 @@ AppRoutes(app, express);
 swagger(app);
 
 // ---------------------------------------------//
-app.listen(config.app.port);
+app.listen(config.app.PORT);
 export default app;
