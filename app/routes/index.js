@@ -10,3 +10,5 @@ router.use('/players', players);
 router.use('/teams', teams);
 router.use('/levels', levels);
 router.use('/auth', auth);
+
+export default router;
