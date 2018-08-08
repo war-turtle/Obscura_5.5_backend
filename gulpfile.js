@@ -9,11 +9,11 @@ gulp.task('default', () => {
   // configure nodemon
   nodemon({
     // the script to run the app
-    script: 'app/index.js',
+    script: 'app.js',
     ext: 'js',
   }).on('restart', () => {
     // when the app has restarted, run livereload.
-    gulp.src('app/index.js')
+    gulp.src('app.js')
       .pipe(livereload())
       .pipe(notify('Reloading page, please wait...'));
   });

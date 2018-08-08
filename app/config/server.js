@@ -1,0 +1,9 @@
+export default {
+
+  HOST: 'http://localhost',
+  PORT: 3000,
+  SESSION_SECRET: 'OKHSD79084570oukdwiuf34905upODUIOT90546908',
+  WEB_TOKEN_SECRET: 'HDFYOE8R43875UOKERIUO879&^(^(&*4074iuoiu701DSFRTTY78',
+
+  UPLOAD_DIR: 'uploads',
+};

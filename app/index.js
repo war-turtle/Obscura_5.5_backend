@@ -3,14 +3,47 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import path from 'path';
 import config from '../config';
 import routes from './routes';
 import {
-  stream, logger,
+  stream,
+  logger,
 } from '../log';
+
+const swaggerJSDoc = require('swagger-jsdoc');
 
 // Initiating app instance
 const app = express();
+console.log(path.join(__dirname, 'pulbic'));
+app.use(express.static(path.join(__dirname, 'pulbic')));
+
+// swagger definition
+const swaggerDefinition = {
+  info: {
+    title: 'Node Swagger API',
+    version: '1.0.0',
+    description: 'Demonstrating how to describe a RESTful API with Swagger',
+  },
+  host: 'localhost:3000',
+  basePath: '/',
+};
+
+// options for the swagger docs
+const options = {
+  // import swaggerDefinitions
+  swaggerDefinition,
+  // path to the API docs
+  apis: ['./**/routes/*.js', 'routes.js'], // pass all in array
+
+};
+
+// initialize swagger-jsdoc
+const swaggerSpec = swaggerJSDoc(options);
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // Connecting to database
 mongoose.connect(config.db.url, {
