@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
-import configDatabase from './config/database';
+import configDatabase from '../config';
 
 mongoose.Promise = global.Promise;
 
 const MongoConnect = () => {
-  const db = mongoose.connect(configDatabase.default.HOST, {
+  const db = mongoose.connect(configDatabase.db.url, {
     useNewUrlParser: true,
   }, (error) => {
     if (error) {
@@ -13,12 +13,6 @@ const MongoConnect = () => {
       console.log('mongo Connected :)');
     }
   });
-  // Create the database connection
-  // When successfully connected
-  mongoose.connection.on('connected', () => {
-    console.log(`Mongoose default connection open to ${configDatabase.default.HOST}`);
-  });
-
   // If the connection throws an error
   mongoose.connection.on('error', (err) => {
     console.log(`Mongoose default connection error: ${err}`);

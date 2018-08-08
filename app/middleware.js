@@ -8,12 +8,12 @@ import morgan from 'morgan';
 import CsrfMiddleware from './global/middlewares/csrfMidlleware';
 import EmptyContentMiddleware from './global/middlewares/EmptyContent';
 import ContentTypeMiddleware from './global/middlewares/ContentType';
-import configServer from './config/server';
+import configServer from '../config';
 import { stream } from '../log';
 
 const middleware = (app) => {
   app.use(passport.initialize());
-  app.set('port', process.env.PORT || configServer.PORT);
+  app.set('port', process.env.PORT || configServer.app.PORT);
   // adding security fixes
   app.disable('x-powered-by');
   app.use(helmet());
@@ -27,7 +27,7 @@ const middleware = (app) => {
   app.enable('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
   app.use(expressSession({
     name: 'SESS_ID',
-    secret: configServer.SESSION_SECRET,
+    secret: configServer.app.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
   }));
