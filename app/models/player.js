@@ -1,5 +1,35 @@
 import mongoose from 'mongoose';
 
+/**
+ * @swagger
+ * definition:
+ *   players:
+ *     properties:
+ *       name:
+ *         type: string
+ *         required: true
+ *       email:
+ *         type: string
+ *         required: true
+ *         unique: true
+ *       team_id:
+ *         type: string
+ *       avatar:
+ *         type: array
+ *       username:
+ *         type: string
+ *         required: true
+ *         unique: true
+ *       phone:
+ *         type: string
+ *         required: true
+ *         unique: true
+ *       created_at:
+ *         type: date
+ *       updated_at:
+ *         type: date
+ */
+
 const PlayerSchema = mongoose.Schema({
   name: {
     type: String,
