@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV='dev' babel-node ./node_modules/.bin/gulp",
-    "dev_win": "set NODE_ENV='dev' babel-node ./node_modules/.bin/gulp",
+    "dev_win": "set NODE_ENV=dev&&gulp",
     "prod": "NODE_ENV='prod' pm2 start app.js --name backend",
-    "prod_win": "set NODE_ENV='prod' babel-node ./node_modules/.bin/gulp"
+    "prod_win": "set NODE_ENV=prod&&gulp"
   },
   "author": "phoenix",
   "license": "MIT",
