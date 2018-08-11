@@ -4,8 +4,8 @@ const swagger = (app) => {
   // swagger definition
   const swaggerDefinition = {
     info: {
-      title: 'Node Swagger API',
-      version: '1.0.0',
+      title: 'Obscura API Docs',
+      version: '5.5.0',
       description: 'Demonstrating how to describe a RESTful API with Swagger',
     },
     host: 'localhost:3000',
