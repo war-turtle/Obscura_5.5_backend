@@ -20,6 +20,8 @@ const router = express.Router();
  *              $ref: '#/definitions/players'
  */
 
+router.get('/');
+
 /**
  * @swagger
  * /players/{id}:
@@ -28,10 +30,10 @@ const router = express.Router();
  *       - in: path
  *         name: id
  *         required: true
- *         type: integer
+ *         type: string
  *         description: id of player
  *     tags:
- *       - player
+ *       - players
  *     description: Returns player with given id
  *     produces:
  *       - application/json
@@ -45,9 +47,11 @@ const router = express.Router();
  *         description: User with specific id not found
  */
 
+router.get('/:id');
+
 /**
  * @swagger
- * /players/{id}:
+ * /players/create:
  *   post:
  *     parameters:
  *       - in: body
@@ -58,8 +62,44 @@ const router = express.Router();
  *           type: object
  *           $ref: '#/definitions/players'
  *     tags:
- *       - player
- *     description: Returns player with given id
+ *       - players
+ *     description: Creates new player
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: New player created
+ *         schema:
+ *           type: object
+ *           $ref: '#/definitions/players'
+ *       400:
+ *         description: User already exists
+ *       401:
+ *         description: Unauthorised request
+ */
+
+router.post('/create');
+
+/**
+ * @swagger
+ * /players/{id}:
+ *   put:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         type: string
+ *         description: id of player
+ *       - in: body
+ *         name: user
+ *         required: true
+ *         description: updated user information
+ *         schema:
+ *           type: object
+ *           $ref: '#/definitions/players'
+ *     tags:
+ *       - players
+ *     description: Updates player with given id
  *     produces:
  *       - application/json
  *     responses:
@@ -70,10 +110,9 @@ const router = express.Router();
  *           $ref: '#/definitions/players'
  *       404:
  *         description: User with specific id not found
+ *       401:
+ *         description: Unauthorized request
  */
-router.get('/');
-router.get('/:id');
-router.post('/create');
 router.put('/:id');
 
 export default router;
