@@ -1,4 +1,9 @@
 import express from 'express';
+import {
+  logger,
+} from '../../../log';
+import Player from '../../models/player';
+
 
 const router = express.Router();
 
@@ -20,7 +25,16 @@ const router = express.Router();
  *              $ref: '#/definitions/players'
  */
 
-router.get('/');
+router.get('/', (req, res) => {
+  Player.find({}, (err, players) => {
+    if (err) {
+      logger.error(err);
+      res.send(err);
+    } else {
+      res.send(players);
+    }
+  });
+});
 
 /**
  * @swagger
@@ -60,7 +74,13 @@ router.get('/:id');
  *         description: the user to create
  *         schema:
  *           type: object
- *           $ref: '#/definitions/players'
+ *           properties:
+ *              name:
+ *                type: string
+ *              email:
+ *                type: string
+ *              username:
+ *                type: string
  *     tags:
  *       - players
  *     description: Creates new player
@@ -78,7 +98,22 @@ router.get('/:id');
  *         description: Unauthorised request
  */
 
-router.post('/create');
+router.post('/create', (req, res) => {
+  const userData = new Player(req.body);
+  userData.save((err, response) => {
+    if (err) {
+      res.json({
+        err,
+        success: false,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: response,
+      });
+    }
+  });
+});
 
 /**
  * @swagger
