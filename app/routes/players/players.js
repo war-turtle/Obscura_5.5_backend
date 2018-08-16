@@ -102,6 +102,7 @@ router.post('/create', (req, res) => {
   const userData = new Player(req.body);
   userData.save((err, response) => {
     if (err) {
+      logger.error(err);
       res.json({
         err,
         success: false,

@@ -24,39 +24,48 @@ import mongoose from 'mongoose';
  *       html:
  *         type: string
  *       created_at:
- *         type: date-time
+ *         type: string
+ *         format: date
  *       updated_at:
- *         type: date-time
+ *         type: string
+ *         format: date
  */
 
 
 const LevelSchema = mongoose.Schema({
   id: {
     type: String,
-    required: true,
   },
   level_no: {
     type: Number,
     required: true,
+    unique: true,
   },
-  url_alias: {
-    type: String,
-    required: true,
-  },
-  picture: {
-    type: [String],
-    required: true,
-  },
-  ans: {
-    type: [String],
-    required: true,
-  },
-  js: {
-    type: String,
-  },
-  html: {
-    type: String,
-  },
+  sub_levels: [{
+    sub_level_no: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+    url_alias: {
+      type: String,
+      required: true,
+    },
+    picture: {
+      type: [String],
+      required: true,
+    },
+    ans: {
+      type: [String],
+      required: true,
+    },
+    js: {
+      type: String,
+    },
+    html: {
+      type: String,
+    },
+  }],
   created_at: {
     type: Date,
     default: new Date(),

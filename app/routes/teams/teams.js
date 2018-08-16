@@ -1,4 +1,6 @@
 import express from 'express';
+import { logger } from '../../../log';
+import Team from '../../models/team';
 
 const router = express.Router();
 
@@ -7,7 +9,7 @@ const router = express.Router();
  * /teams:
  *   get:
  *     tags:
- *       - levels
+ *       - teams
  *     description: Returns all teams
  *     produces:
  *       - application/json
@@ -20,8 +22,22 @@ const router = express.Router();
  *              $ref: '#/definitions/teams'
  */
 
-router.get('/');
-
+router.get('/', (req, res) => {
+  Team.find({}, (err, teams) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        err,
+        success: false,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: teams,
+      });
+    }
+  });
+});
 
 /**
  * @swagger

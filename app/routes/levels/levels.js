@@ -1,4 +1,8 @@
 import express from 'express';
+import {
+  logger,
+} from '../../../log';
+import Level from '../../models/level';
 
 const router = express.Router();
 
@@ -20,7 +24,22 @@ const router = express.Router();
  *              $ref: '#/definitions/levels'
  */
 
-router.get('/');
+router.get('/', (req, res) => {
+  Level.find({}, (err, levels) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        err,
+        success: false,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: levels,
+      });
+    }
+  });
+});
 
 /**
  * @swagger
@@ -60,7 +79,9 @@ router.get('/:id');
  *         description: the level to create
  *         schema:
  *           type: object
- *           $ref: '#/definitions/levels'
+ *           properties:
+ *              level_no:
+ *                  type: number
  *     tags:
  *       - levels
  *     description: Creates new level
@@ -78,7 +99,23 @@ router.get('/:id');
  *         description: Unauthorised request
  */
 
-router.post('/create');
+router.post('/create', (req, res) => {
+  const levelData = new Level(req.body);
+  levelData.save((err, response) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        err,
+        success: false,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: response,
+      });
+    }
+  });
+});
 
 /**
  * @swagger
@@ -114,7 +151,7 @@ router.post('/create');
  *         description: Unauthorized request
  */
 
-router.put('/:id');
+router.put('/:id', (req, res) => {});
 
 /**
  * @swagger
