@@ -9,6 +9,7 @@ import MongoConnect from './app/mongoose';
 import AppRoutes from './app/routes';
 import AppMiddleware from './app/middleware';
 import swagger from './app/swagger';
+import sockets from './app/socket';
 
 addPath(__dirname);
 
@@ -20,7 +21,7 @@ MongoConnect();
 AppMiddleware(app);
 AppRoutes(app, express);
 swagger(app);
-
 // ---------------------------------------------//
-app.listen(config.app.PORT);
+const server = app.listen(config.app.PORT);
+sockets(server);
 export default app;
