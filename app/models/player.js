@@ -37,11 +37,15 @@ const PlayerSchema = mongoose.Schema({
 
   team_id: String,
 
-  avatar: String,
+  picture: String,
+
+  onboard: {
+    type: Boolean,
+    default: false,
+  },
 
   username: {
     type: String,
-    required: true,
     unique: true,
   },
 
