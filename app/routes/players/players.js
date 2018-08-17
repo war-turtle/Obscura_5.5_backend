@@ -1,8 +1,11 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
+import async from 'async';
 import {
   logger,
 } from '../../../log';
 import Player from '../../models/player';
+import config from '../../../config';
 
 
 const router = express.Router();
@@ -61,46 +64,9 @@ router.get('/', (req, res) => {
  *         description: User with specific id not found
  */
 
-router.get('/:id');
-
-/**
- * @swagger
- * /players/create:
- *   post:
- *     parameters:
- *       - in: body
- *         name: user
- *         required: true
- *         description: the user to create
- *         schema:
- *           type: object
- *           properties:
- *              name:
- *                type: string
- *              email:
- *                type: string
- *              username:
- *                type: string
- *     tags:
- *       - players
- *     description: Creates new player
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: New player created
- *         schema:
- *           type: object
- *           $ref: '#/definitions/players'
- *       400:
- *         description: User already exists
- *       401:
- *         description: Unauthorised request
- */
-
-router.post('/create', (req, res) => {
-  const userData = new Player(req.body);
-  userData.save((err, response) => {
+router.get('/:id', (req, res) => {
+  const userId = req.params.id;
+  Player.findById(userId, (err, player) => {
     if (err) {
       logger.error(err);
       res.json({
@@ -110,7 +76,7 @@ router.post('/create', (req, res) => {
     } else {
       res.json({
         success: true,
-        data: response,
+        data: player,
       });
     }
   });
@@ -132,7 +98,13 @@ router.post('/create', (req, res) => {
  *         description: updated user information
  *         schema:
  *           type: object
- *           $ref: '#/definitions/players'
+ *           properties:
+ *              picture:
+ *                type: string
+ *              username:
+ *                type: string
+ *              phone:
+ *                type: number
  *     tags:
  *       - players
  *     description: Updates player with given id
@@ -143,12 +115,72 @@ router.post('/create', (req, res) => {
  *         description: Object of a particular player
  *         schema:
  *           type: object
- *           $ref: '#/definitions/players'
+ *           properties:
+ *              success:
+ *                type: boolean
+ *              data:
+ *                type: object
+ *                properties:
+ *                    token:
+ *                      type: string
  *       404:
  *         description: User with specific id not found
  *       401:
  *         description: Unauthorized request
  */
-router.put('/:id');
+router.put('/:id', (req, res) => {
+  const playerId = req.params.id;
+  const data = req.body;
+
+  const tasks = [
+
+    // updating the player details
+    (callback) => {
+      Player.updateOne({
+        _id: playerId,
+      }, {
+        $set: data,
+      }, (err, updatedPlayer) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, updatedPlayer);
+      });
+    },
+
+    // fetching the player for making jwt token
+    (data, callback) => {
+      Player.findById(playerId, (err, player) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, player);
+      });
+    },
+  ];
+
+  async.waterfall(tasks, (err, playerData) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        success: false,
+        err,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: {
+          token: jwt.sign({
+            playerData,
+          }, config.app.WEB_TOKEN_SECRET, {
+            expiresIn: config.app.jwt_expiry_time,
+          }),
+        },
+      });
+    }
+  });
+});
 
 export default router;

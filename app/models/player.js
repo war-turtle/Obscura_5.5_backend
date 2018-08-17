@@ -9,6 +9,10 @@ import mongoose from 'mongoose';
  *         type: string
  *       email:
  *         type: string
+ *       admin:
+ *         type: boolean
+ *       onboard:
+ *         type: boolean
  *       team_id:
  *         type: string
  *       avatar:
@@ -27,6 +31,11 @@ const PlayerSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
+  },
+
+  admin: {
+    type: Boolean,
+    default: false,
   },
 
   email: {

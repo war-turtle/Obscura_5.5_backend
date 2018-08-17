@@ -6,6 +6,9 @@ mongoose.Promise = global.Promise;
 const MongoConnect = () => {
   const db = mongoose.connect(configDatabase.db.url, {
     useNewUrlParser: true,
+    socketTimeoutMS: 30000,
+    keepAlive: true,
+    reconnectTries: 30000,
   }, (error) => {
     if (error) {
       console.log(`Mongoose default connection error: ${error}`);

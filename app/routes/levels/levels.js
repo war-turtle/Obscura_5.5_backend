@@ -66,7 +66,23 @@ router.get('/', (req, res) => {
  *         description: level with specific id not found
  */
 
-router.get('/:id');
+router.get('/:id', (req, res) => {
+  const levelId = req.params.id;
+  Level.findById(levelId, (err, level) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        err,
+        success: false,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: level,
+      });
+    }
+  });
+});
 
 /**
  * @swagger
@@ -151,7 +167,23 @@ router.post('/create', (req, res) => {
  *         description: Unauthorized request
  */
 
-router.put('/:id', (req, res) => {});
+router.put('/:id', (req, res) => {
+  const levelData = new Level(req.body);
+  levelData.save((err, response) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        err,
+        success: false,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: response,
+      });
+    }
+  });
+});
 
 /**
  * @swagger
@@ -183,7 +215,5 @@ router.put('/:id', (req, res) => {});
  *       401:
  *         description: Unauthorized request
  */
-
-router.post('/:id');
 
 export default router;

@@ -74,7 +74,7 @@ router.post('/login', (req, res) => {
           return callback(null, user);
         });
       } else {
-        return callback("provider not given", null);
+        return callback('provider not given', null);
       }
     },
 
@@ -130,7 +130,5 @@ router.post('/login', (req, res) => {
     }
   });
 });
-
-router.post('/onBoard');
 
 export default router;

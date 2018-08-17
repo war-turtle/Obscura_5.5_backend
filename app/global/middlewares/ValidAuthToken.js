@@ -1,23 +1,17 @@
 import jwt from 'jsonwebtoken';
-import Service from 'app/helper/Service';
 import ResponseTemplate from '../templates/response';
-import configServer from '../../config/server';
+import configServer from '../../../config';
+import Player from '../../models/player';
 
 const ValidAuthToken = (req, res, next) => {
-  const authorizationHeader = req.headers.authorization;
-  let token;
-
-  if (authorizationHeader) {
-    token = authorizationHeader.split(' ')[1];
-  }
+  const token = req.headers.authorization;
 
   if (token) {
-    console.log(token);
     jwt.verify(token, configServer.WEB_TOKEN_SECRET, (err, decodedUser) => {
       if (err) {
         res.json(ResponseTemplate.authError());
       } else {
-        Service.user.findById(decodedUser.id, (error, user) => {
+        Player.findById(decodedUser.id, (error, user) => {
           if (error) {
             res.json(ResponseTemplate.authError());
           } else {
