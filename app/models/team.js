@@ -24,7 +24,7 @@ import mongoose from 'mongoose';
  *           properties:
  *             id:
  *               type: string
- *             name:
+ *             username:
  *               type: string
  *             level_cleared:
  *               type: number
@@ -55,7 +55,10 @@ const TeamSchema = new mongoose.Schema({
   players: {
     type: [{
       _id: String,
-      name: String,
+      username: {
+        type: String,
+        unique: true,
+      },
       level_cleared: {
         type: Number,
         default: 0,
@@ -64,10 +67,12 @@ const TeamSchema = new mongoose.Schema({
   },
   requests: {
     type: [{
-      requester_id: String,
-      created_at: {
+      requester_id: {
         type: String,
-        format: Date,
+        unique: true,
+      },
+      created_at: {
+        type: Date,
         default: new Date(),
       },
     }],

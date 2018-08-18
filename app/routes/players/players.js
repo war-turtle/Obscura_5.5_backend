@@ -201,7 +201,7 @@ router.put('/:id', (req, res) => {
           success: true,
           data: {
             token: jwt.sign({
-              playerData,
+              user: playerData,
             }, config.app.WEB_TOKEN_SECRET, {
               expiresIn: config.app.jwt_expiry_time,
             }),

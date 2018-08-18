@@ -100,7 +100,7 @@ router.get('/:id', (req, res) => {
 
 /**
  * @swagger
- * /teams/create:
+ * /teams:
  *   post:
  *     parameters:
  *       - in: header
@@ -136,12 +136,12 @@ router.get('/:id', (req, res) => {
  *         description: Unauthorised request
  */
 
-router.post('/create', (req, res) => {
+router.post('/', (req, res) => {
   const teamData = req.body;
   teamData.admin_id = req.user._id;
   teamData.players = [{
     _id: req.user._id,
-    name: req.user.name,
+    username: req.user.username,
   }];
 
   const tasks = [
@@ -160,7 +160,9 @@ router.post('/create', (req, res) => {
       Player.updateOne({
         _id: req.user._id,
       }, {
-        $set: { team_id: teamDetails._id },
+        $set: {
+          team_id: teamDetails._id,
+        },
       }, (err, updatedPlayer) => {
         if (err) {
           logger.error(err);
@@ -194,7 +196,7 @@ router.post('/create', (req, res) => {
         success: true,
         data: {
           token: jwt.sign({
-            playerData,
+            user: playerData,
           }, config.app.WEB_TOKEN_SECRET, {
             expiresIn: config.app.jwt_expiry_time,
           }),
@@ -218,7 +220,19 @@ router.post('/create', (req, res) => {
  *         name: id
  *         required: true
  *         type: string
- *         description: id of team
+ *       - in: query
+ *         name: action
+ *         required: true
+ *         type: string
+ *       - in: body
+ *         name: team
+ *         required: true
+ *         description: updated team information
+ *         schema:
+ *           type: object
+ *           properties:
+ *              reqId:
+ *                  type: string
  *     tags:
  *       - teams
  *     description: Updates team with given id
@@ -237,8 +251,92 @@ router.post('/create', (req, res) => {
  */
 
 router.put('/:id', (req, res) => {
-  const tasks = [
+  const task2 = [
+    // Retreiving the player by req
+    (callback) => {
+      const reqId = req.body.reqId;
+      Team.findOne({
+        _id: req.params.id,
+      }, {
+        requests: {
+          $elemMatch: {
+            _id: reqId,
+          },
+        },
+      }, (err, request) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, request);
+      });
+    },
+    // getting user details
+    (request, callback) => {
+      Player.findById(request.requests[0].requester_id, (err, player) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        if (player.team_id) {
+          return callback('Player has already joined a team', null);
+        }
+        Player.updateOne({
+          _id: request.requests[0].requester_id,
+        }, {
+          $set: {
+            team_id: req.params.id,
+          },
+        }, (err1, updatedPlayer) => {
+          if (err1) {
+            logger.error(err1);
+            return callback(err1, null);
+          }
+          return callback(null, player);
+          // TODO:= update the JWT of the requester
+        });
+      });
+    },
 
+    (player, callback) => {
+      Team.updateOne({
+        _id: req.params.id,
+      }, {
+        $push: {
+          players: {
+            _id: player._id,
+            username: player.username,
+          },
+        },
+      }, (err, res) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, player);
+      });
+    },
+    // Deleting the processed request
+    (player, callback) => {
+      Team.update({}, {
+        $pull: {
+          requests: {
+            requester_id: player._id,
+          },
+        },
+      }, {
+        multi: true,
+      }, (err, response) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, response);
+      });
+    },
+  ];
+
+  const task1 = [
     // Checking the user dont exist in another team
     (callback) => {
       Player.findById(req.user._id, (err, player) => {
@@ -253,11 +351,39 @@ router.put('/:id', (req, res) => {
       });
     },
 
+    // Checking for the request in same team
+
+    (player, callback) => {
+      const reqId = req.body.reqId;
+      Team.findOne({
+        _id: req.params.id,
+      }, {
+        requests: {
+          $elemMatch: {
+            _id: reqId,
+          },
+        },
+      }, (err, request) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        if (request) {
+          return callback('Request already sent', null);
+        }
+        return callback(null, player);
+      });
+    },
+
     (player, callback) => {
       Team.updateOne({
         _id: req.params.id,
       }, {
-        $push: { requests: { requester_id: req.user._id } },
+        $push: {
+          requests: {
+            requester_id: req.user._id,
+          },
+        },
       }, (err, res) => {
         if (err) {
           logger.error(err);
@@ -268,7 +394,38 @@ router.put('/:id', (req, res) => {
     },
   ];
 
-  async.waterfall(tasks, (err, response) => {
+  const task3 = [
+    (callback) => {
+      Team.update({ _id: req.params.id }, {
+        $pull: {
+          requests: {
+            _id: req.body.reqId,
+          },
+        },
+      }, (err, response) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, response);
+      });
+    },
+  ];
+
+  const taskDecider = (action) => {
+    switch (action) {
+      case 'request':
+        return task1;
+      case 'accept_request':
+        return task2;
+      case 'delete':
+        return task3;
+      default:
+        return null;
+    }
+  };
+
+  async.waterfall(taskDecider(req.query.action), (err, response) => {
     if (err) {
       logger.error(err);
       res.json({
