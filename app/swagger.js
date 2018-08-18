@@ -12,10 +12,18 @@ const swagger = (app) => {
     basePath: '/',
   };
 
+  const securityDefinitions = {
+    api_key: {
+      type: 'apiKey',
+      name: 'api_key',
+      in: 'header',
+    },
+  };
   // options for the swagger docs
   const options = {
     // import swaggerDefinitions
     swaggerDefinition,
+    securityDefinitions,
     // path to the API docs
     apis: ['./**/**/routes/*/*', './**/**/models/*'],
   };

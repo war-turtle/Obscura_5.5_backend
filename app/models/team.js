@@ -7,12 +7,16 @@ import mongoose from 'mongoose';
  *     properties:
  *       id:
  *         type: string
+ *       name:
+ *         type: string
  *       admin_id:
  *         type: string
  *       picture:
  *         type: string
- *       avatar_url:
- *         type: string
+ *       level_no:
+ *         type: number
+ *       sub_levels:
+ *         type: number
  *       players:
  *         type: array
  *         items:
@@ -22,29 +26,40 @@ import mongoose from 'mongoose';
  *               type: string
  *             name:
  *               type: string
+ *             level_cleared:
+ *               type: number
  */
 
 const TeamSchema = new mongoose.Schema({
-  id: {
+  name: {
     type: String,
     required: true,
+    unique: true,
   },
   admin_id: {
     type: String,
     required: true,
   },
-  picture: {
-    type: String,
-    required: true,
+  level_no: {
+    type: Number,
+    default: 0,
   },
-  avatar_url: {
+  sub_levels: {
+    type: Number,
+    default: 0,
+  },
+  picture: {
     type: String,
     required: true,
   },
   players: {
     type: [{
-      id: String,
+      _id: String,
       name: String,
+      level_cleared: {
+        type: Number,
+        default: 0,
+      },
     }],
   },
 });

@@ -1,5 +1,7 @@
 import express from 'express';
-import { logger } from '../../../log';
+import {
+  logger,
+} from '../../../log';
 import Team from '../../models/team';
 
 const router = express.Router();
@@ -71,13 +73,22 @@ router.get('/:id');
  * /teams/create:
  *   post:
  *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *       - in: body
  *         name: team
  *         required: true
  *         description: the team to create
  *         schema:
  *           type: object
- *           $ref: '#/definitions/teams'
+ *           properties:
+ *              picture:
+ *                type: string
+ *              name:
+ *                 type: string
  *     tags:
  *       - teams
  *     description: Creates new team
@@ -95,7 +106,30 @@ router.get('/:id');
  *         description: Unauthorised request
  */
 
-router.post('/create');
+router.post('/create', (req, res) => {
+  const teamData = req.body;
+  teamData.admin_id = req.user._id;
+  teamData.players = [{
+    _id: req.user._id,
+    name: req.user.name,
+  }];
+
+  const dbTeamData = new Team(teamData);
+  dbTeamData.save((err, response) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        err,
+        success: false,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: response,
+      });
+    }
+  });
+});
 
 /**
  * @swagger
