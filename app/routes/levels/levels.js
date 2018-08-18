@@ -10,6 +10,12 @@ const router = express.Router();
  * @swagger
  * /levels:
  *   get:
+ *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *     tags:
  *       - levels
  *     description: Returns all levels
@@ -46,6 +52,11 @@ router.get('/', (req, res) => {
  * /levels/{id}:
  *   get:
  *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *       - in: path
  *         name: id
  *         required: true
@@ -89,6 +100,11 @@ router.get('/:id', (req, res) => {
  * /levels/create:
  *   post:
  *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *       - in: body
  *         name: level
  *         required: true
@@ -138,6 +154,11 @@ router.post('/create', (req, res) => {
  * /levels/{id}:
  *   put:
  *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *       - in: path
  *         name: id
  *         required: true
@@ -190,6 +211,11 @@ router.put('/:id', (req, res) => {
  * /levels/{id}:
  *   post:
  *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *       - in: path
  *         name: id
  *         required: true

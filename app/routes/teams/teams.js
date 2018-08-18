@@ -1,8 +1,12 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
+import async from 'async';
 import {
   logger,
 } from '../../../log';
 import Team from '../../models/team';
+import Player from '../../models/player';
+import config from '../../../config';
 
 const router = express.Router();
 
@@ -10,6 +14,12 @@ const router = express.Router();
  * @swagger
  * /teams:
  *   get:
+ *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *     tags:
  *       - teams
  *     description: Returns all teams
@@ -46,6 +56,11 @@ router.get('/', (req, res) => {
  * /teams/{id}:
  *   get:
  *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *       - in: path
  *         name: id
  *         required: true
@@ -114,18 +129,61 @@ router.post('/create', (req, res) => {
     name: req.user.name,
   }];
 
-  const dbTeamData = new Team(teamData);
-  dbTeamData.save((err, response) => {
+  const tasks = [
+    (callback) => {
+      const dbTeamData = new Team(teamData);
+      dbTeamData.save((err, response) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, response);
+      });
+    },
+
+    (teamDetails, callback) => {
+      Player.updateOne({
+        _id: req.user._id,
+      }, {
+        $set: { team_id: teamDetails._id },
+      }, (err, updatedPlayer) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, updatedPlayer);
+      });
+    },
+
+    // fetching the player for making jwt token
+    (data, callback) => {
+      Player.findById(req.user._id, (err, player) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, player);
+      });
+    },
+  ];
+
+  async.waterfall(tasks, (err, playerData) => {
     if (err) {
       logger.error(err);
       res.json({
-        err,
         success: false,
+        err,
       });
     } else {
       res.json({
         success: true,
-        data: response,
+        data: {
+          token: jwt.sign({
+            playerData,
+          }, config.app.WEB_TOKEN_SECRET, {
+            expiresIn: config.app.jwt_expiry_time,
+          }),
+        },
       });
     }
   });
@@ -136,6 +194,11 @@ router.post('/create', (req, res) => {
  * /teams/{id}:
  *   put:
  *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *       - in: path
  *         name: id
  *         required: true

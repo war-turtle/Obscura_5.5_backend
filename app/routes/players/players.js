@@ -14,6 +14,12 @@ const router = express.Router();
  * @swagger
  * /players:
  *   get:
+ *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *     tags:
  *       - players
  *     description: Returns all players
@@ -44,6 +50,11 @@ router.get('/', (req, res) => {
  * /players/{id}:
  *   get:
  *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *       - in: path
  *         name: id
  *         required: true
@@ -65,7 +76,7 @@ router.get('/', (req, res) => {
  */
 
 router.get('/:id', (req, res) => {
-  const userId = req.params.id;
+  const userId = req.user._id;
   Player.findById(userId, (err, player) => {
     if (err) {
       logger.error(err);
@@ -87,6 +98,11 @@ router.get('/:id', (req, res) => {
  * /players/{id}:
  *   put:
  *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         required: true
+ *         type: string
+ *         description: JWT Token
  *       - in: path
  *         name: id
  *         required: true
@@ -129,8 +145,9 @@ router.get('/:id', (req, res) => {
  *         description: Unauthorized request
  */
 router.put('/:id', (req, res) => {
-  const playerId = req.params.id;
+  const playerId = req.user._id;
   const data = req.body;
+  data.onboard = true;
 
   const tasks = [
 

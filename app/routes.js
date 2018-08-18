@@ -5,9 +5,9 @@ import auth from './routes/auth/auth';
 import requireAuth from './global/middlewares/ValidAuthToken';
 
 const router = (app) => {
-  app.use('/players', players);
+  app.use('/players', requireAuth, players);
   app.use('/teams', requireAuth, teams);
-  app.use('/levels', levels);
+  app.use('/levels', requireAuth, levels);
   app.use('/auth', auth);
 };
 
