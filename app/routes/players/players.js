@@ -40,7 +40,10 @@ router.get('/', (req, res) => {
       logger.error(err);
       res.send(err);
     } else {
-      res.send(players);
+      res.json({
+        success: true,
+        data: players,
+      });
     }
   });
 });
@@ -77,20 +80,27 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   const userId = req.user._id;
-  Player.findById(userId, (err, player) => {
-    if (err) {
-      logger.error(err);
-      res.json({
-        err,
-        success: false,
-      });
-    } else {
-      res.json({
-        success: true,
-        data: player,
-      });
-    }
-  });
+
+  if (userId === req.params.id) {
+    Player.findById(userId, (err, player) => {
+      if (err) {
+        logger.error(err);
+        res.json({
+          err,
+          success: false,
+        });
+      } else {
+        res.json({
+          success: true,
+          data: player,
+        });
+      }
+    });
+  } else {
+    res.json({
+      success: false,
+    });
+  }
 });
 
 /**
@@ -178,26 +188,32 @@ router.put('/:id', (req, res) => {
     },
   ];
 
-  async.waterfall(tasks, (err, playerData) => {
-    if (err) {
-      logger.error(err);
-      res.json({
-        success: false,
-        err,
-      });
-    } else {
-      res.json({
-        success: true,
-        data: {
-          token: jwt.sign({
-            playerData,
-          }, config.app.WEB_TOKEN_SECRET, {
-            expiresIn: config.app.jwt_expiry_time,
-          }),
-        },
-      });
-    }
-  });
+  if (playerId === req.params.id) {
+    async.waterfall(tasks, (err, playerData) => {
+      if (err) {
+        logger.error(err);
+        res.json({
+          success: false,
+          err,
+        });
+      } else {
+        res.json({
+          success: true,
+          data: {
+            token: jwt.sign({
+              playerData,
+            }, config.app.WEB_TOKEN_SECRET, {
+              expiresIn: config.app.jwt_expiry_time,
+            }),
+          },
+        });
+      }
+    });
+  } else {
+    res.json({
+      success: false,
+    });
+  }
 });
 
 export default router;

@@ -62,6 +62,16 @@ const TeamSchema = new mongoose.Schema({
       },
     }],
   },
+  requests: {
+    type: [{
+      requester_id: String,
+      created_at: {
+        type: String,
+        format: Date,
+        default: new Date(),
+      },
+    }],
+  },
 });
 
 export default mongoose.model('Team', TeamSchema);

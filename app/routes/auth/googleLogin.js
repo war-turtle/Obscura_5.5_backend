@@ -10,7 +10,6 @@ const verify = (loginInfo, callback) => {
       logger.error(err);
       return callback(err, null);
     }
-    logger.info(res);
     return callback(null, res);
   });
 };

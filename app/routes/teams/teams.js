@@ -81,7 +81,22 @@ router.get('/', (req, res) => {
  *         description: team with specific id not found
  */
 
-router.get('/:id');
+router.get('/:id', (req, res) => {
+  Team.findById(req.params.id, (err, team) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        success: false,
+        err,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: team,
+      });
+    }
+  });
+});
 
 /**
  * @swagger
@@ -204,13 +219,6 @@ router.post('/create', (req, res) => {
  *         required: true
  *         type: string
  *         description: id of team
- *       - in: body
- *         name: team
- *         required: true
- *         description: updated team information
- *         schema:
- *           type: object
- *           $ref: '#/definitions/teams'
  *     tags:
  *       - teams
  *     description: Updates team with given id
@@ -228,6 +236,51 @@ router.post('/create', (req, res) => {
  *         description: Unauthorized request
  */
 
-router.put('/:id');
+router.put('/:id', (req, res) => {
+  const tasks = [
+
+    // Checking the user dont exist in another team
+    (callback) => {
+      Player.findById(req.user._id, (err, player) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        if (player.team_id) {
+          return callback('Player has already joined a team', null);
+        }
+        return callback(null, player);
+      });
+    },
+
+    (player, callback) => {
+      Team.updateOne({
+        _id: req.params.id,
+      }, {
+        $push: { requests: { requester_id: req.user._id } },
+      }, (err, res) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, res);
+      });
+    },
+  ];
+
+  async.waterfall(tasks, (err, response) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        success: false,
+        err,
+      });
+    } else {
+      res.json({
+        success: true,
+      });
+    }
+  });
+});
 
 export default router;
