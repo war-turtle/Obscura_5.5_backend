@@ -1,8 +1,10 @@
 import express from 'express';
+import async from 'async';
 import {
   logger,
 } from '../../../log';
 import Level from '../../models/level';
+import levelController from './levelController';
 
 const router = express.Router();
 
@@ -16,6 +18,10 @@ const router = express.Router();
  *         required: true
  *         type: string
  *         description: JWT Token
+ *       - in: query
+ *         name: alias
+ *         type: string
+ *         description: id of level
  *     tags:
  *       - levels
  *     description: Returns all levels
@@ -30,7 +36,7 @@ const router = express.Router();
  *              $ref: '#/definitions/levels'
  */
 
-router.get('/', (req, res) => {
+router.get('/', levelController.levelValidator, (req, res) => {
   Level.find({}, (err, levels) => {
     if (err) {
       logger.error(err);
@@ -77,7 +83,7 @@ router.get('/', (req, res) => {
  *         description: level with specific id not found
  */
 
-router.get('/:id', (req, res) => {
+router.get('/:id', levelController.levelValidator, (req, res) => {
   const levelId = req.params.id;
   Level.findById(levelId, (err, level) => {
     if (err) {
@@ -97,7 +103,7 @@ router.get('/:id', (req, res) => {
 
 /**
  * @swagger
- * /levels/create:
+ * /levels:
  *   post:
  *     parameters:
  *       - in: header
@@ -131,7 +137,7 @@ router.get('/:id', (req, res) => {
  *         description: Unauthorised request
  */
 
-router.post('/create', (req, res) => {
+router.post('/', (req, res) => {
   const levelData = new Level(req.body);
   levelData.save((err, response) => {
     if (err) {
@@ -170,7 +176,23 @@ router.post('/create', (req, res) => {
  *         description: updated level information
  *         schema:
  *           type: object
- *           $ref: '#/definitions/levels'
+ *           properties:
+ *              sub_level_no:
+ *                type: number
+ *              url_alias:
+ *                type: string
+ *              picture:
+ *                type: array
+ *                items:
+ *                    type: string
+ *              ans:
+ *                type: array
+ *                items:
+ *                    type: string
+ *              js:
+ *                type: string
+ *              html:
+ *                type: string
  *     tags:
  *       - levels
  *     description: Updates level with given id
@@ -189,8 +211,13 @@ router.post('/create', (req, res) => {
  */
 
 router.put('/:id', (req, res) => {
-  const levelData = new Level(req.body);
-  levelData.save((err, response) => {
+  Level.updateOne({
+    _id: req.params.id,
+  }, {
+    $push: {
+      sub_levels: req.body,
+    },
+  }, (err, res1) => {
     if (err) {
       logger.error(err);
       res.json({
@@ -200,7 +227,7 @@ router.put('/:id', (req, res) => {
     } else {
       res.json({
         success: true,
-        data: response,
+        data: res1,
       });
     }
   });
@@ -241,5 +268,30 @@ router.put('/:id', (req, res) => {
  *       401:
  *         description: Unauthorized request
  */
+
+router.post('/:id', levelController.levelValidator, (req, res) => {
+  const tasks = [
+
+
+    (callback) => {
+
+    },
+  ];
+
+  async.waterfall(tasks, (err, response) => {
+    if (err) {
+      logger.error(err);
+      res.json({
+        err,
+        success: false,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: response,
+      });
+    }
+  });
+});
 
 export default router;
