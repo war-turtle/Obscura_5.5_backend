@@ -45,11 +45,11 @@ const LevelSchema = mongoose.Schema({
     sub_level_no: {
       type: Number,
       required: true,
-      unique: true,
     },
     url_alias: {
       type: String,
       required: true,
+      unique: true,
     },
     picture: {
       type: [String],

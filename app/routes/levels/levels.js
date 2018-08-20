@@ -21,7 +21,12 @@ const router = express.Router();
  *       - in: query
  *         name: alias
  *         type: string
- *         description: id of level
+ *         description: alias of level
+ *       - in: query
+ *         name: action
+ *         type: string
+ *         required: true
+ *         description: alias of level
  *     tags:
  *       - levels
  *     description: Returns all levels
@@ -36,8 +41,34 @@ const router = express.Router();
  *              $ref: '#/definitions/levels'
  */
 
-router.get('/', levelController.levelValidator, (req, res) => {
-  Level.find({}, (err, levels) => {
+router.get('/', (req, res) => {
+  const task1 = [
+    (callback) => {
+      levelController.getCurrentLevel(req.user, req.query.alias, (err, level) => {
+        if (err) {
+          return callback(err, null);
+        }
+        return callback(null, level);
+      });
+    },
+  ];
+
+  const task2 = [
+
+  ];
+
+  const taskDecider = (action) => {
+    switch (action) {
+      case 'getCurrentLevel':
+        return task1;
+      case 'getAllLevels':
+        return task2;
+      default:
+        return null;
+    }
+  };
+
+  async.waterfall(taskDecider(req.query.action), (err, response) => {
     if (err) {
       logger.error(err);
       res.json({
@@ -47,7 +78,7 @@ router.get('/', levelController.levelValidator, (req, res) => {
     } else {
       res.json({
         success: true,
-        data: levels,
+        data: response,
       });
     }
   });
@@ -83,7 +114,7 @@ router.get('/', levelController.levelValidator, (req, res) => {
  *         description: level with specific id not found
  */
 
-router.get('/:id', levelController.levelValidator, (req, res) => {
+router.get('/:id', (req, res) => {
   const levelId = req.params.id;
   Level.findById(levelId, (err, level) => {
     if (err) {
@@ -269,7 +300,7 @@ router.put('/:id', (req, res) => {
  *         description: Unauthorized request
  */
 
-router.post('/:id', levelController.levelValidator, (req, res) => {
+router.post('/:id', (req, res) => {
   const tasks = [
 
 

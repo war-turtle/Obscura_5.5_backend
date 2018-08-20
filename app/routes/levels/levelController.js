@@ -5,24 +5,23 @@ import {
 import Level from '../../models/level';
 import Team from '../../models/team';
 
-const levelValidator = (req, res, next) => {
+const getCurrentLevel = (user, alias, callback) => {
   const tasks = [
     (callback) => {
-      Team.findById(req.user.team_id, (err, team) => {
+      Team.findById(user.team_id, (err, team) => {
         if (err) {
           logger.error(err);
           return callback(err, null);
         }
-        req.team = team;
         return callback(null, team);
       });
     },
 
     (team, callback) => {
-      Level.findOne({}, {
+      Level.findOne({
         sub_levels: {
           $elemMatch: {
-            url_alias: req.query.alias,
+            url_alias: alias,
           },
         },
       }, (err, level) => {
@@ -30,38 +29,85 @@ const levelValidator = (req, res, next) => {
           logger.error(err);
           return callback(err, null);
         }
-        // req.level = level;
-        // const teamLevelNo = team.level_no;
-        // const teamSubLevelNo = team.sub_levels;
+        if (level) {
+          const teamLevelNo = team.level_no;
+          const teamSubLevelNo = team.sub_levels;
 
-        // if (level.level_no > teamLevelNo) {
-        //   return callback('access denied', null);
-        // }
-        // if (level.sub_levels.length > teamSubLevelNo) {
-        //   return callback('access denied', null);
-        // }
-        return callback(null, level);
+          if (level.level_no > teamLevelNo) {
+            return callback('access denied', null);
+          }
+          if (level.sub_levels[0].sub_level_no > teamSubLevelNo) {
+            return callback('access denied', null);
+          }
+
+          return callback(null, level);
+        }
+        return callback('No level found', null);
       });
     },
   ];
 
   async.waterfall(tasks, (err, response) => {
     if (err) {
-      logger(err);
-      res.json({
-        success: false,
-        err,
-      });
-    } else {
-      res.json({
-        success: true,
-        data: response,
-      });
+      logger.error(err);
+      return callback(err, null);
     }
+    return callback(null, response);
   });
 };
 
 
+const getAllLevels = (user, callback) => {
+  const tasks = [
+    (callback) => {
+      Team.findById(user.team_id, (err, team) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, team);
+      });
+    },
+
+    (team, callback) => {
+      Level.findOne({
+        sub_levels: {
+          $elemMatch: {
+            url_alias: alias,
+          },
+        },
+      }, (err, level) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        if (level) {
+          const teamLevelNo = team.level_no;
+          const teamSubLevelNo = team.sub_levels;
+
+          if (level.level_no > teamLevelNo) {
+            return callback('access denied', null);
+          }
+          if (level.sub_levels[0].sub_level_no > teamSubLevelNo) {
+            return callback('access denied', null);
+          }
+
+          return callback(null, level);
+        }
+        return callback('No level found', null);
+      });
+    },
+  ];
+
+  async.waterfall(tasks, (err, response) => {
+    if (err) {
+      logger.error(err);
+      return callback(err, null);
+    }
+    return callback(null, response);
+  });
+};
+
 export default {
-  levelValidator,
+  getCurrentLevel,
 };
