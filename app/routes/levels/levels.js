@@ -5,6 +5,7 @@ import {
 } from '../../../log';
 import Level from '../../models/level';
 import levelController from './levelController';
+import Team from '../../models/team';
 
 const router = express.Router();
 
@@ -44,7 +45,7 @@ const router = express.Router();
 router.get('/', (req, res) => {
   const task1 = [
     (callback) => {
-      levelController.getCurrentLevel(req.user, req.query.alias, (err, level) => {
+      levelController.getAliasLevel(req.user, req.query.alias, (err, level) => {
         if (err) {
           return callback(err, null);
         }
@@ -54,12 +55,19 @@ router.get('/', (req, res) => {
   ];
 
   const task2 = [
-
+    (callback) => {
+      levelController.getAllLevels(req.user, (err, levels) => {
+        if (err) {
+          return callback(err, null);
+        }
+        return callback(null, levels);
+      });
+    },
   ];
 
   const taskDecider = (action) => {
     switch (action) {
-      case 'getCurrentLevel':
+      case 'getAliasLevel':
         return task1;
       case 'getAllLevels':
         return task2;
@@ -248,7 +256,8 @@ router.put('/:id', (req, res) => {
     $push: {
       sub_levels: req.body,
     },
-  }, (err, res1) => {
+  },
+  (err, res1) => {
     if (err) {
       logger.error(err);
       res.json({
@@ -266,7 +275,7 @@ router.put('/:id', (req, res) => {
 
 /**
  * @swagger
- * /levels/{id}:
+ * /levels/{alias}:
  *   post:
  *     parameters:
  *       - in: header
@@ -275,15 +284,19 @@ router.put('/:id', (req, res) => {
  *         type: string
  *         description: JWT Token
  *       - in: path
- *         name: id
+ *         name: alias
  *         required: true
  *         type: string
- *         description: id of level
+ *         description: url_alias of level
  *       - in: body
- *         name: answer
+ *         name: ans
  *         required: true
  *         description: answer of user
- *         type: string
+ *         schema:
+ *            type: object
+ *            properties:
+ *               ans:
+ *                  type: string
  *     tags:
  *       - levels
  *     description: Checks answer for given level
@@ -300,12 +313,91 @@ router.put('/:id', (req, res) => {
  *         description: Unauthorized request
  */
 
-router.post('/:id', (req, res) => {
+router.post('/:alias', (req, res) => {
+  const userAns = req.body.ans;
+  const levelAlias = req.params.alias;
+  let teamLevelNo;
+  let teamSubLevelNo;
+
   const tasks = [
-
-
+    // getting level from the alias
     (callback) => {
+      levelController.getAliasLevel(req.user, levelAlias, (err, data) => {
+        if (err) {
+          return callback(err, null);
+        }
+        req.level = data.level;
+        const subLevel = data.level.sub_levels.filter(obj => obj.url_alias === levelAlias)[0]; // always 0 index because alias is unique
+        req.sub_level = subLevel;
+        teamLevelNo = data.teamLevelNo;
+        teamSubLevelNo = data.teamSubLevelNo;
+        return callback(null, subLevel);
+      });
+    },
 
+    // matching ans
+    (subLevel, callback) => {
+      const levelAns = subLevel.ans;
+      if (levelAns.indexOf(userAns) > -1) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
+  ];
+
+  const task1 = [
+    // getting the user_team and updating columns
+    (callback) => {
+      let newLevelNo;
+      let newSubLevelNo;
+      if (req.sub_level.sub_level_no === req.level.sub_levels.length) {
+        newLevelNo = req.level.level_no + 1;
+        newSubLevelNo = 1;
+      } else {
+        newLevelNo = req.level.level_no;
+        newSubLevelNo = req.sub_level.sub_level_no + 1;
+      }
+      if (teamLevelNo === req.level.level_no && req.sub_level.sub_level_no === teamSubLevelNo) {
+        // updating team
+        if (!req.user.admin) {
+          Team.update({
+            'players._id': req.user._id,
+          }, {
+            $inc: {
+              'players.$.level_cleared': 1,
+            },
+            $set: {
+              level_no: newLevelNo,
+              sub_levels: newSubLevelNo,
+              updated_at: new Date(),
+            },
+          },
+          (err, team) => {
+            if (err) {
+              return callback(err, null);
+            }
+            return callback(null, {
+              newLevelNo,
+              newSubLevelNo,
+            });
+          });
+        }
+      } else {
+        return callback(null, {
+          newLevelNo,
+          newSubLevelNo,
+        });
+      }
+    },
+
+    // getting next level alias
+    (data, callback) => {
+      levelController.getNextLevelAlias(data.newLevelNo, data.newSubLevelNo, (err, level) => {
+        if (err) {
+          return callback(err, null);
+        }
+        return callback(null, level);
+      });
     },
   ];
 
@@ -316,10 +408,26 @@ router.post('/:id', (req, res) => {
         err,
         success: false,
       });
-    } else {
+    } else if (!response) {
       res.json({
         success: true,
-        data: response,
+        ansCorrect: false,
+      });
+    } else {
+      async.waterfall(task1, (err, level) => {
+        if (err) {
+          logger.error(err);
+          res.json({
+            err,
+            success: false,
+          });
+        } else {
+          res.json({
+            success: true,
+            ansCorrect: true,
+            data: level,
+          });
+        }
       });
     }
   });

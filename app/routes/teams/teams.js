@@ -20,6 +20,18 @@ const router = express.Router();
  *         required: true
  *         type: string
  *         description: JWT Token
+ *       - in: query
+ *         name: limit
+ *         type: number
+ *         description: limit of teams
+ *       - in: query
+ *         name: skip
+ *         type: number
+ *         description: skip the teams
+ *       - in: query
+ *         name: sort
+ *         type: boolean
+ *         description: sort or not the teams
  *     tags:
  *       - teams
  *     description: Returns all teams
@@ -35,20 +47,28 @@ const router = express.Router();
  */
 
 router.get('/', (req, res) => {
-  Team.find({}, (err, teams) => {
-    if (err) {
-      logger.error(err);
-      res.json({
-        err,
-        success: false,
-      });
-    } else {
-      res.json({
-        success: true,
-        data: teams,
-      });
-    }
-  });
+  const options = req.query.sort ? {
+    level_no: -1,
+    updated_at: 1,
+  } : null;
+  Team.find()
+    .sort(options)
+    .skip(req.query.skip)
+    .limit(req.query.limit)
+    .exec((err, teams) => {
+      if (err) {
+        logger.error(err);
+        res.json({
+          err,
+          success: false,
+        });
+      } else {
+        res.json({
+          success: true,
+          data: teams,
+        });
+      }
+    });
 });
 
 /**
@@ -396,7 +416,9 @@ router.put('/:id', (req, res) => {
 
   const task3 = [
     (callback) => {
-      Team.update({ _id: req.params.id }, {
+      Team.update({
+        _id: req.params.id,
+      }, {
         $pull: {
           requests: {
             _id: req.body.reqId,

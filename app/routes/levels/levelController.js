@@ -5,7 +5,7 @@ import {
 import Level from '../../models/level';
 import Team from '../../models/team';
 
-const getCurrentLevel = (user, alias, callback) => {
+const getAliasLevel = (user, alias, callback) => {
   const tasks = [
     (callback) => {
       Team.findById(user.team_id, (err, team) => {
@@ -24,7 +24,8 @@ const getCurrentLevel = (user, alias, callback) => {
             url_alias: alias,
           },
         },
-      }, (err, level) => {
+      },
+      (err, level) => {
         if (err) {
           logger.error(err);
           return callback(err, null);
@@ -36,11 +37,17 @@ const getCurrentLevel = (user, alias, callback) => {
           if (level.level_no > teamLevelNo) {
             return callback('access denied', null);
           }
-          if (level.sub_levels[0].sub_level_no > teamSubLevelNo) {
-            return callback('access denied', null);
+          if (level.level_no === teamLevelNo) {
+            if (level.sub_levels.filter(o => o.url_alias === alias)[0].sub_level_no > teamSubLevelNo) {
+              return callback('access denied', null);
+            }
           }
 
-          return callback(null, level);
+          return callback(null, {
+            level,
+            teamLevelNo,
+            teamSubLevelNo,
+          });
         }
         return callback('No level found', null);
       });
@@ -70,31 +77,17 @@ const getAllLevels = (user, callback) => {
     },
 
     (team, callback) => {
-      Level.findOne({
-        sub_levels: {
-          $elemMatch: {
-            url_alias: alias,
-          },
+      Level.find({
+        level_no: {
+          $lte: team.level_no,
         },
-      }, (err, level) => {
+      }, (err, levels) => {
         if (err) {
           logger.error(err);
           return callback(err, null);
         }
-        if (level) {
-          const teamLevelNo = team.level_no;
-          const teamSubLevelNo = team.sub_levels;
-
-          if (level.level_no > teamLevelNo) {
-            return callback('access denied', null);
-          }
-          if (level.sub_levels[0].sub_level_no > teamSubLevelNo) {
-            return callback('access denied', null);
-          }
-
-          return callback(null, level);
-        }
-        return callback('No level found', null);
+        // Todo := filtering sublevels
+        return callback(null, levels);
       });
     },
   ];
@@ -108,6 +101,25 @@ const getAllLevels = (user, callback) => {
   });
 };
 
+const getNextLevelAlias = (levelNo, subLevelNo, callback) => {
+  Level.findOne({
+    level_no: levelNo,
+  }, {
+    sub_levels: {
+      $elemMatch: {
+        sub_level_no: subLevelNo,
+      },
+    },
+  }, (err, level) => {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, level);
+  });
+};
+
 export default {
-  getCurrentLevel,
+  getAliasLevel,
+  getAllLevels,
+  getNextLevelAlias,
 };
