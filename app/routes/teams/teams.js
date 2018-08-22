@@ -166,6 +166,9 @@ router.post('/', (req, res) => {
 
   const tasks = [
     (callback) => {
+      if (req.user.team_id) {
+        return callback('Player has joined already another team', null);
+      }
       const dbTeamData = new Team(teamData);
       dbTeamData.save((err, response) => {
         if (err) {

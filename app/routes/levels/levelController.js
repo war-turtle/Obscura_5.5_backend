@@ -4,10 +4,14 @@ import {
 } from '../../../log';
 import Level from '../../models/level';
 import Team from '../../models/team';
+import constraints from '../../helper/constraints';
 
 const getAliasLevel = (user, alias, callback) => {
   const tasks = [
     (callback) => {
+      if (!user.team_id) {
+        return callback('Player dont belong from any team', null);
+      }
       Team.findById(user.team_id, (err, team) => {
         if (err) {
           logger.error(err);
@@ -24,6 +28,8 @@ const getAliasLevel = (user, alias, callback) => {
             url_alias: alias,
           },
         },
+      }, {
+        'sub_levels.$': 1,
       },
       (err, level) => {
         if (err) {
@@ -75,20 +81,25 @@ const getAllLevels = (user, callback) => {
         return callback(null, team);
       });
     },
-
     (team, callback) => {
-      Level.find({
+      const queryCondition = !user.admin ? {
         level_no: {
           $lte: team.level_no,
         },
-      }, (err, levels) => {
-        if (err) {
-          logger.error(err);
-          return callback(err, null);
-        }
-        // Todo := filtering sublevels
-        return callback(null, levels);
-      });
+      } : {};
+      Level.find(queryCondition,
+        constraints.levelRetrieveInfo, (err, levels) => {
+          if (err) {
+            logger.error(err);
+            return callback(err, null);
+          }
+          // this is a hack can fail in some cases
+          levels.map((l) => {
+            l.sub_levels = l.sub_levels.sort((a, b) => a.sub_level_no > b.sub_level_no);
+            l.sub_levels = l.sub_levels[0];
+          });
+          return callback(null, levels);
+        });
     },
   ];
 

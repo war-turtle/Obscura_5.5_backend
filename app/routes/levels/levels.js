@@ -49,7 +49,9 @@ router.get('/', (req, res) => {
         if (err) {
           return callback(err, null);
         }
-        return callback(null, level);
+        const subLevel = level.level.sub_levels[0].toObject();
+        delete subLevel.ans;
+        return callback(null, subLevel);
       });
     },
   ];
