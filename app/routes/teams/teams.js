@@ -377,21 +377,23 @@ router.put('/:id', (req, res) => {
     // Checking for the request in same team
 
     (player, callback) => {
-      const reqId = req.body.reqId;
+      const reqId = req.user._id;
+      console.log(reqId);
       Team.findOne({
         _id: req.params.id,
       }, {
         requests: {
           $elemMatch: {
-            _id: reqId,
+            requester_id: reqId,
           },
         },
-      }, (err, request) => {
+      }, (err, data) => {
         if (err) {
           logger.error(err);
           return callback(err, null);
         }
-        if (request) {
+        console.log(data);
+        if (data.requests.length) {
           return callback('Request already sent', null);
         }
         return callback(null, player);

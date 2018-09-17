@@ -10,6 +10,7 @@ const verify = (loginInfo, callback) => {
       logger.error(err);
       return callback(err, null);
     }
+    res.picture = res.picture.data.url;
     return callback(null, res);
   });
 };

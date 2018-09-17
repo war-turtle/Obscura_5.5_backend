@@ -52,7 +52,6 @@ const router = express.Router();
 
 router.post('/login', (req, res) => {
   const loginData = req.body;
-  console.log(loginData);
 
   const tasks = [
 
