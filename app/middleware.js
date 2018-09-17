@@ -39,9 +39,7 @@ const middleware = (app) => {
    * enable CORS support. // Cross-Origin Request Support
    */
   // register all custom Middleware
-  app.use(cors({
-    optionsSuccessStatus: 200,
-  }));
+  app.use(cors());
   app.use(morgan('combined', {
     stream,
   }));

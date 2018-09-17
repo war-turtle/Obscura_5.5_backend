@@ -11,47 +11,48 @@ import config from '../../../config';
 const router = express.Router();
 
 /**
- * @swagger
- * /auth/login:
- *   post:
- *     parameters:
- *       - in: body
- *         name: login credentials
- *         required: true
- *         description: for user login or signup
- *         schema:
- *           type: object
- *           properties:
- *              id_token:
- *                type: string
- *              provider:
- *                type: string
- *     tags:
- *       - auth
- *     description: Creates new player or login
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Player Logged in
- *         schema:
- *           type: object
- *           properties:
- *              success:
- *                 type: boolean
- *              data:
- *                 type: object
- *                 properties:
- *                    token:
- *                       type: string
- *       400:
- *         description: User already exists
- *       401:
- *         description: Unauthorised request
- */
+   * @swagger
+   * /auth/login:
+   *   post:
+   *     parameters:
+   *       - in: body
+   *         name: login credentials
+   *         required: true
+   *         description: for user login or signup
+   *         schema:
+   *           type: object
+   *           properties:
+   *              id_token:
+   *                type: string
+   *              provider:
+   *                type: string
+   *     tags:
+   *       - auth
+   *     description: Creates new player or login
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Player Logged in
+   *         schema:
+   *           type: object
+   *           properties:
+   *              success:
+   *                 type: boolean
+   *              data:
+   *                 type: object
+   *                 properties:
+   *                    token:
+   *                       type: string
+   *       400:
+   *         description: User already exists
+   *       401:
+   *         description: Unauthorised request
+   */
 
 router.post('/login', (req, res) => {
   const loginData = req.body;
+  console.log(loginData);
 
   const tasks = [
 
@@ -80,6 +81,7 @@ router.post('/login', (req, res) => {
 
     // Checking the user in database amd further processing
     (user, callback) => {
+      console.log(user, 1);
       Player.findOne({
         email: user.email,
       }, (err, player) => {

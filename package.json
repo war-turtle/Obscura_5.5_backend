@@ -4,7 +4,7 @@
   "description": "obscura backend ",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV='dev' babel-node ./node_modules/.bin/gulp",
+    "dev": "NODE_ENV='dev' nodemon app.js",
     "dev_win": "set NODE_ENV=dev&&gulp",
     "prod": "NODE_ENV='prod' pm2 start app.js --name backend",
     "prod_win": "set NODE_ENV=prod&&gulp"
