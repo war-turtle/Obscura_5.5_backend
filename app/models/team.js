@@ -46,7 +46,7 @@ const TeamSchema = new mongoose.Schema({
   },
   sub_levels: {
     type: Number,
-    default: 0,
+    default: 1,
   },
   picture: {
     type: String,

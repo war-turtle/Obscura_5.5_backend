@@ -112,7 +112,7 @@ const getAllLevels = (user, callback) => {
   });
 };
 
-const getNextLevelAlias = (levelNo, subLevelNo, callback) => {
+const getLevelAlias = (levelNo, subLevelNo, callback) => {
   Level.findOne({
     level_no: levelNo,
   }, {
@@ -132,5 +132,5 @@ const getNextLevelAlias = (levelNo, subLevelNo, callback) => {
 export default {
   getAliasLevel,
   getAllLevels,
-  getNextLevelAlias,
+  getLevelAlias,
 };

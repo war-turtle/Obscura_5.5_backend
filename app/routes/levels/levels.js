@@ -67,12 +67,39 @@ router.get('/', (req, res) => {
     },
   ];
 
+  const task3 = [
+    (callback) => {
+      Team.findById(req.user.team_id, (err, team) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        return callback(null, team);
+      });
+    },
+
+    (team, callback) => {
+      console.log(team.level_no, team.sub_levels);
+      levelController.getLevelAlias(team.level_no, team.sub_levels, (err, level) => {
+        if (err) {
+          return callback(err, null);
+        }
+        if (level.sub_levels.length) {
+          return callback(null, { alias: level.sub_levels[0].url_alias });
+        }
+        return callback('NO LEVEL FOUND', null);
+      });
+    },
+  ];
+
   const taskDecider = (action) => {
     switch (action) {
       case 'getAliasLevel':
         return task1;
       case 'getAllLevels':
         return task2;
+      case 'getLevelAlias':
+        return task3;
       default:
         return null;
     }
@@ -394,7 +421,7 @@ router.post('/:alias', (req, res) => {
 
     // getting next level alias
     (data, callback) => {
-      levelController.getNextLevelAlias(data.newLevelNo, data.newSubLevelNo, (err, level) => {
+      levelController.getLevelAlias(data.newLevelNo, data.newSubLevelNo, (err, level) => {
         if (err) {
           return callback(err, null);
         }

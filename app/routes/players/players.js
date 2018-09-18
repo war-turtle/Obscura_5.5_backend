@@ -188,7 +188,7 @@ router.put('/:id', (req, res) => {
     },
   ];
 
-  if (playerId === req.params.id) {
+  if (playerId.toString() === req.params.id) {
     async.waterfall(tasks, (err, playerData) => {
       if (err) {
         logger.error(err);
