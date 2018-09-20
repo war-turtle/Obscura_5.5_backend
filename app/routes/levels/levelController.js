@@ -121,7 +121,7 @@ const getLevelAlias = (levelNo, subLevelNo, callback) => {
         sub_level_no: subLevelNo,
       },
     },
-  }, (err, level) => {
+  }, constraints.levelRetrieveInfo, (err, level) => {
     if (err) {
       return callback(err, null);
     }

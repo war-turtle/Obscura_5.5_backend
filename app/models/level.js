@@ -42,6 +42,10 @@ const LevelSchema = mongoose.Schema({
     unique: true,
   },
   sub_levels: [{
+    name: {
+      type: String,
+      required: true,
+    },
     sub_level_no: {
       type: Number,
       required: true,

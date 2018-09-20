@@ -79,7 +79,6 @@ router.get('/', (req, res) => {
     },
 
     (team, callback) => {
-      console.log(team.level_no, team.sub_levels);
       levelController.getLevelAlias(team.level_no, team.sub_levels, (err, level) => {
         if (err) {
           return callback(err, null);
@@ -377,16 +376,26 @@ router.post('/:alias', (req, res) => {
   const task1 = [
     // getting the user_team and updating columns
     (callback) => {
+      Level.findById(req.level._id, (err, level) => {
+        if (err) {
+          return callback(err, null);
+        }
+        return callback(null, level);
+      });
+    },
+
+    (level, callback) => {
       let newLevelNo;
       let newSubLevelNo;
-      if (req.sub_level.sub_level_no === req.level.sub_levels.length) {
-        newLevelNo = req.level.level_no + 1;
+      if (req.sub_level.sub_level_no === level.sub_levels.length) {
+        newLevelNo = level.level_no + 1;
         newSubLevelNo = 1;
       } else {
-        newLevelNo = req.level.level_no;
+        newLevelNo = level.level_no;
         newSubLevelNo = req.sub_level.sub_level_no + 1;
       }
-      if (teamLevelNo === req.level.level_no && req.sub_level.sub_level_no === teamSubLevelNo) {
+      console.log(newLevelNo, newSubLevelNo);
+      if (teamLevelNo === level.level_no && req.sub_level.sub_level_no === teamSubLevelNo) {
         // updating team
         if (!req.user.admin) {
           Team.update({
@@ -425,7 +434,10 @@ router.post('/:alias', (req, res) => {
         if (err) {
           return callback(err, null);
         }
-        return callback(null, level);
+        if (level.sub_levels.length) {
+          return callback(null, { alias: level.sub_levels[0].url_alias });
+        }
+        return callback('NO LEVEL FOUND', null);
       });
     },
   ];
