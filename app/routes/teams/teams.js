@@ -51,24 +51,47 @@ router.get('/', (req, res) => {
     level_no: -1,
     updated_at: 1,
   } : null;
-  Team.find()
-    .sort(options)
-    .skip(req.query.skip)
-    .limit(req.query.limit)
-    .exec((err, teams) => {
-      if (err) {
-        logger.error(err);
-        res.status(400).json({
-          err,
-          success: false,
+  const task = [
+    (callback) => {
+      Team.find()
+        .sort(options)
+        .skip(parseInt(req.query.skip, 10))
+        .limit(parseInt(req.query.limit, 10))
+        .exec((err, teams) => {
+          if (err) {
+            logger.error(err);
+            return callback(err, null);
+          }
+          return callback(null, teams);
         });
-      } else {
-        res.status(200).json({
-          success: true,
-          data: teams,
-        });
-      }
-    });
+    },
+
+    (callback) => {
+      Team.countDocuments({}, (err, count) => {
+        if (err) {
+          return callback(err, null);
+        }
+        return callback(null, count);
+      });
+    },
+  ];
+
+  async.parallel(task, (err, response) => {
+    if (err) {
+      res.json({
+        success: false,
+        err,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: {
+          count: response[1],
+          teams: response[0],
+        },
+      });
+    }
+  });
 });
 
 /**
@@ -105,12 +128,12 @@ router.get('/:id', (req, res) => {
   Team.findById(req.params.id, (err, team) => {
     if (err) {
       logger.error(err);
-      res.status(404).json({
+      res.json({
         success: false,
         err,
       });
     } else {
-      res.status(200).json({
+      res.json({
         success: true,
         data: team,
       });
@@ -191,18 +214,27 @@ router.post('/', (req, res) => {
           logger.error(err);
           return callback(err, null);
         }
-        return callback(null, updatedPlayer);
+        return callback(null, teamDetails._id);
+      });
+    },
+
+    (teamId, callback) => {
+      Team.findById(teamId, (err, team) => {
+        if (err) {
+          return callback(err, null);
+        }
+        return callback(null, team);
       });
     },
 
     // fetching the player for making jwt token
-    (data, callback) => {
+    (team, callback) => {
       Player.findById(req.user._id, (err, player) => {
         if (err) {
           logger.error(err);
           return callback(err, null);
         }
-        return callback(null, player);
+        return callback(null, { player, team });
       });
     },
   ];
@@ -210,19 +242,20 @@ router.post('/', (req, res) => {
   async.waterfall(tasks, (err, playerData) => {
     if (err) {
       logger.error(err);
-      res.status(400).json({
+      res.json({
         success: false,
         err,
       });
     } else {
-      res.status(200).json({
+      res.json({
         success: true,
         data: {
           token: jwt.sign({
-            user: playerData,
+            user: playerData.player,
           }, config.app.WEB_TOKEN_SECRET, {
             expiresIn: config.app.jwt_expiry_time,
           }),
+          team: playerData.team,
         },
       });
     }
@@ -299,10 +332,10 @@ router.put('/:id', (req, res) => {
       Player.findById(request.requests[0].requester_id, (err, player) => {
         if (err) {
           logger.error(err);
-          return callback({ err, status: 404 }, null);
+          return callback(err, null);
         }
         if (player.team_id) {
-          return callback({ error: 'Player has already joined a team', status: 400 }, null);
+          return callback('Player has already joined a team', null);
         }
         Player.updateOne({
           _id: request.requests[0].requester_id,
@@ -378,7 +411,6 @@ router.put('/:id', (req, res) => {
 
     (player, callback) => {
       const reqId = req.user._id;
-      console.log(reqId);
       Team.findOne({
         _id: req.params.id,
       }, {
@@ -392,7 +424,6 @@ router.put('/:id', (req, res) => {
           logger.error(err);
           return callback(err, null);
         }
-        console.log(data);
         if (data.requests.length) {
           return callback('Request already sent', null);
         }
@@ -407,6 +438,8 @@ router.put('/:id', (req, res) => {
         $push: {
           requests: {
             requester_id: req.user._id,
+            username: req.user.username,
+            picture: req.user.picture,
           },
         },
       }, (err, res) => {
@@ -460,7 +493,7 @@ router.put('/:id', (req, res) => {
         err,
       });
     } else {
-      res.status(200).json({
+      res.json({
         success: true,
       });
     }
