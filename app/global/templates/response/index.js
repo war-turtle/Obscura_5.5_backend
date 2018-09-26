@@ -12,7 +12,7 @@ const Response = {
   },
   authError() {
     return Response.error(
-      403,
+      401,
       'authentication error',
       'no authentication token provided, please login first and provide the authentication token.',
     );

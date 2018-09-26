@@ -11,11 +11,11 @@ const ValidAuthToken = (req, res, next) => {
     jwt.verify(token, configServer.app.WEB_TOKEN_SECRET, (err, decodedUser) => {
       if (err) {
         logger.error(err);
-        res.json(ResponseTemplate.authError());
+        res.status(401).json(ResponseTemplate.authError());
       } else {
         Player.findById(decodedUser.user._id, (error, user) => {
           if (error) {
-            res.json(ResponseTemplate.authError());
+            res.status(401).json(ResponseTemplate.authError());
           } else {
             req.user = user;
             next();
@@ -24,7 +24,7 @@ const ValidAuthToken = (req, res, next) => {
       }
     });
   } else {
-    res.json(ResponseTemplate.authError());
+    res.status(401).json(ResponseTemplate.authError());
   }
 };
 

@@ -38,9 +38,9 @@ router.get('/', (req, res) => {
   Player.find({}, (err, players) => {
     if (err) {
       logger.error(err);
-      res.send(err);
+      res.status(404).send(err);
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: players,
       });
@@ -80,24 +80,23 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   const userId = req.user._id;
-
   if (userId === req.params.id) {
     Player.findById(userId, (err, player) => {
       if (err) {
         logger.error(err);
-        res.json({
+        res.status(404).json({
           err,
           success: false,
         });
       } else {
-        res.json({
+        res.status(200).json({
           success: true,
           data: player,
         });
       }
     });
   } else {
-    res.json({
+    res.status(404).json({ // a
       success: false,
     });
   }
@@ -199,12 +198,12 @@ router.put('/:id', (req, res) => {
     async.waterfall(tasks, (err, playerData) => {
       if (err) {
         logger.error(err);
-        res.json({
+        res.status(404).json({
           success: false,
           err,
         });
       } else {
-        res.json({
+        res.status(200).json({
           success: true,
           data: {
             token: jwt.sign({
@@ -217,7 +216,7 @@ router.put('/:id', (req, res) => {
       }
     });
   } else {
-    res.json({
+    res.status(403).json({
       success: false,
     });
   }
