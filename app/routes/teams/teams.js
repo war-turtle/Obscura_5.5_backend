@@ -51,24 +51,47 @@ router.get('/', (req, res) => {
     level_no: -1,
     updated_at: 1,
   } : null;
-  Team.find()
-    .sort(options)
-    .skip(req.query.skip)
-    .limit(req.query.limit)
-    .exec((err, teams) => {
-      if (err) {
-        logger.error(err);
-        res.json({
-          err,
-          success: false,
+  const task = [
+    (callback) => {
+      Team.find()
+        .sort(options)
+        .skip(parseInt(req.query.skip, 10))
+        .limit(parseInt(req.query.limit, 10))
+        .exec((err, teams) => {
+          if (err) {
+            logger.error(err);
+            return callback(err, null);
+          }
+          return callback(null, teams);
         });
-      } else {
-        res.json({
-          success: true,
-          data: teams,
-        });
-      }
-    });
+    },
+
+    (callback) => {
+      Team.countDocuments({}, (err, count) => {
+        if (err) {
+          return callback(err, null);
+        }
+        return callback(null, count);
+      });
+    },
+  ];
+
+  async.parallel(task, (err, response) => {
+    if (err) {
+      res.json({
+        success: false,
+        err,
+      });
+    } else {
+      res.json({
+        success: true,
+        data: {
+          count: response[1],
+          teams: response[0],
+        },
+      });
+    }
+  });
 });
 
 /**
@@ -191,18 +214,27 @@ router.post('/', (req, res) => {
           logger.error(err);
           return callback(err, null);
         }
-        return callback(null, updatedPlayer);
+        return callback(null, teamDetails._id);
+      });
+    },
+
+    (teamId, callback) => {
+      Team.findById(teamId, (err, team) => {
+        if (err) {
+          return callback(err, null);
+        }
+        return callback(null, team);
       });
     },
 
     // fetching the player for making jwt token
-    (data, callback) => {
+    (team, callback) => {
       Player.findById(req.user._id, (err, player) => {
         if (err) {
           logger.error(err);
           return callback(err, null);
         }
-        return callback(null, player);
+        return callback(null, { player, team });
       });
     },
   ];
@@ -219,10 +251,11 @@ router.post('/', (req, res) => {
         success: true,
         data: {
           token: jwt.sign({
-            user: playerData,
+            user: playerData.player,
           }, config.app.WEB_TOKEN_SECRET, {
             expiresIn: config.app.jwt_expiry_time,
           }),
+          team: playerData.team,
         },
       });
     }
@@ -378,7 +411,6 @@ router.put('/:id', (req, res) => {
 
     (player, callback) => {
       const reqId = req.user._id;
-      console.log(reqId);
       Team.findOne({
         _id: req.params.id,
       }, {
@@ -392,7 +424,6 @@ router.put('/:id', (req, res) => {
           logger.error(err);
           return callback(err, null);
         }
-        console.log(data);
         if (data.requests.length) {
           return callback('Request already sent', null);
         }
@@ -407,6 +438,8 @@ router.put('/:id', (req, res) => {
         $push: {
           requests: {
             requester_id: req.user._id,
+            username: req.user.username,
+            picture: req.user.picture,
           },
         },
       }, (err, res) => {

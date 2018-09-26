@@ -36,26 +36,34 @@ const getAliasLevel = (user, alias, callback) => {
           logger.error(err);
           return callback(err, null);
         }
-        if (level) {
-          const teamLevelNo = team.level_no;
-          const teamSubLevelNo = team.sub_levels;
-
-          if (level.level_no > teamLevelNo) {
-            return callback('access denied', null);
-          }
-          if (level.level_no === teamLevelNo) {
-            if (level.sub_levels.filter(o => o.url_alias === alias)[0].sub_level_no > teamSubLevelNo) {
-              return callback('access denied', null);
-            }
-          }
-
-          return callback(null, {
-            level,
-            teamLevelNo,
-            teamSubLevelNo,
-          });
+        if (level.sub_levels.length) {
+          return callback(err, { level, team });
         }
         return callback('No level found', null);
+      });
+    },
+
+    (data, callback) => {
+      Level.findById(data.level._id, (err, level) => {
+        if (err) {
+          return callback(err, null);
+        }
+        const teamLevelNo = data.team.level_no;
+        const teamSubLevelNo = data.team.sub_levels;
+        if (level.level_no > teamLevelNo) {
+          return callback('access denied', null);
+        }
+        if (level.level_no === teamLevelNo) {
+          if (data.level.sub_levels.filter(o => o.url_alias === alias)[0].sub_level_no > teamSubLevelNo) {
+            return callback('access denied', null);
+          }
+        }
+
+        return callback(null, {
+          level,
+          teamLevelNo,
+          teamSubLevelNo,
+        });
       });
     },
   ];
@@ -77,6 +85,9 @@ const getAllLevels = (user, callback) => {
         if (err) {
           logger.error(err);
           return callback(err, null);
+        }
+        if (!team) {
+          return callback('NO TEAM FOUND', null);
         }
         return callback(null, team);
       });

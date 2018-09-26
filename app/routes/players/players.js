@@ -161,8 +161,15 @@ router.put('/:id', (req, res) => {
 
   const tasks = [
 
-    // updating the player details
     (callback) => {
+      if (req.user.onboard) {
+        return callback('Already onboarded', null);
+      }
+      return callback(null, req.user.onboard);
+    },
+
+    // updating the player details
+    (condition, callback) => {
       Player.updateOne({
         _id: playerId,
       }, {

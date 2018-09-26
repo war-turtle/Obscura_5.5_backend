@@ -80,7 +80,6 @@ router.post('/login', (req, res) => {
 
     // Checking the user in database amd further processing
     (user, callback) => {
-      console.log(user, 1);
       Player.findOne({
         email: user.email,
       }, (err, player) => {

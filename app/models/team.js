@@ -75,6 +75,17 @@ const TeamSchema = new mongoose.Schema({
         type: Date,
         default: new Date(),
       },
+      username: String,
+      picture: String,
+    }],
+  },
+  timeline: {
+    type: [{
+      level_no: {
+        type: Number,
+        unique: true,
+      },
+      cleared_at: Date,
     }],
   },
 });
