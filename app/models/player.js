@@ -55,7 +55,6 @@ const PlayerSchema = mongoose.Schema({
 
   username: {
     type: String,
-    unique: true,
   },
 
   phone: {

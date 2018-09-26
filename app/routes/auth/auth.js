@@ -52,7 +52,6 @@ const router = express.Router();
 
 router.post('/login', (req, res) => {
   const loginData = req.body;
-
   const tasks = [
 
     // Verifying token of the user
@@ -80,7 +79,6 @@ router.post('/login', (req, res) => {
 
     // Checking the user in database amd further processing
     (user, callback) => {
-      console.log(user, 1);
       Player.findOne({
         email: user.email,
       }, (err, player) => {
@@ -117,12 +115,12 @@ router.post('/login', (req, res) => {
   async.waterfall(tasks, (err, response) => {
     if (err) {
       logger.error(err);
-      res.json({
+      res.status(401).json({
         err,
         success: false,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: {
           token: response,

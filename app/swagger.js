@@ -8,7 +8,7 @@ const swagger = (app) => {
       version: '5.5.0',
       description: 'Demonstrating how to describe a RESTful API with Swagger',
     },
-    host: 'localhost:3000',
+    host: 'localhost:8000',
     basePath: '/',
   };
 

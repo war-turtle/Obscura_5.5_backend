@@ -58,12 +58,12 @@ router.get('/', (req, res) => {
     .exec((err, teams) => {
       if (err) {
         logger.error(err);
-        res.json({
+        res.status(400).json({
           err,
           success: false,
         });
       } else {
-        res.json({
+        res.status(200).json({
           success: true,
           data: teams,
         });
@@ -105,12 +105,12 @@ router.get('/:id', (req, res) => {
   Team.findById(req.params.id, (err, team) => {
     if (err) {
       logger.error(err);
-      res.json({
+      res.status(404).json({
         success: false,
         err,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: team,
       });
@@ -210,12 +210,12 @@ router.post('/', (req, res) => {
   async.waterfall(tasks, (err, playerData) => {
     if (err) {
       logger.error(err);
-      res.json({
+      res.status(400).json({
         success: false,
         err,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: {
           token: jwt.sign({
@@ -299,10 +299,10 @@ router.put('/:id', (req, res) => {
       Player.findById(request.requests[0].requester_id, (err, player) => {
         if (err) {
           logger.error(err);
-          return callback(err, null);
+          return callback({ err, status: 404 }, null);
         }
         if (player.team_id) {
-          return callback('Player has already joined a team', null);
+          return callback({ error: 'Player has already joined a team', status: 400 }, null);
         }
         Player.updateOne({
           _id: request.requests[0].requester_id,
@@ -460,7 +460,7 @@ router.put('/:id', (req, res) => {
         err,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
       });
     }

@@ -107,12 +107,12 @@ router.get('/', (req, res) => {
   async.waterfall(taskDecider(req.query.action), (err, response) => {
     if (err) {
       logger.error(err);
-      res.json({
+      res.status().json({
         err,
         success: false,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: response,
       });
@@ -155,12 +155,12 @@ router.get('/:id', (req, res) => {
   Level.findById(levelId, (err, level) => {
     if (err) {
       logger.error(err);
-      res.json({
+      res.status(404).json({
         err,
         success: false,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: level,
       });
@@ -214,7 +214,7 @@ router.post('/', (req, res) => {
         success: false,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: response,
       });
@@ -288,12 +288,12 @@ router.put('/:id', (req, res) => {
   (err, res1) => {
     if (err) {
       logger.error(err);
-      res.json({
+      res.status(404).json({
         err,
         success: false,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: res1,
       });
