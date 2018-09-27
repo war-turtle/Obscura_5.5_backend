@@ -67,6 +67,7 @@ const TeamSchema = new mongoose.Schema({
         type: Number,
         default: 0,
       },
+      picture: String,
     }],
   },
   requests: {

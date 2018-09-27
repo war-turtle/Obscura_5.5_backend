@@ -162,6 +162,7 @@ router.put('/:id', (req, res) => {
   playerInfo.phone = data.phone;
   playerInfo.username = data.username;
   playerInfo.college = data.college;
+  playerInfo.onboard = true;
   data.onboard = true;
 
   const tasks = [

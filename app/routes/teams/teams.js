@@ -366,6 +366,7 @@ router.put('/:id', (req, res) => {
           players: {
             _id: player._id,
             username: player.username,
+            picture: player.picture,
           },
         },
       }, (err, res) => {
