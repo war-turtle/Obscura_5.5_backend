@@ -27,8 +27,8 @@ const middleware = (app) => {
   app.use(helmet.xssFilter()); // set X-XSS-Protection header
   app.enable('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
   app.use(rateLimit({
-    windowMs: 60 * 1000,
-    max: 5,
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: 'Too many requeets',
   }));
   app.use(expressSession({

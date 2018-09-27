@@ -6,6 +6,7 @@ import {
 } from '../../../log';
 import Player from '../../models/player';
 import config from '../../../config';
+import AdminChecker from '../../global/middlewares/adminChecker';
 
 
 const router = express.Router();
@@ -34,7 +35,7 @@ const router = express.Router();
  *              $ref: '#/definitions/players'
  */
 
-router.get('/', (req, res) => {
+router.get('/', AdminChecker, (req, res) => {
   Player.find({}, (err, players) => {
     if (err) {
       logger.error(err);
@@ -87,6 +88,7 @@ router.get('/:id', (req, res) => {
         res.status(404).json({
           err,
           success: false,
+          message: 'Player not found.',
         });
       } else {
         res.status(200).json({
@@ -156,6 +158,10 @@ router.get('/:id', (req, res) => {
 router.put('/:id', (req, res) => {
   const playerId = req.user._id;
   const data = req.body;
+  const playerInfo = {};
+  playerInfo.phone = data.phone;
+  playerInfo.username = data.username;
+  playerInfo.college = data.college;
   data.onboard = true;
 
   const tasks = [
@@ -172,7 +178,7 @@ router.put('/:id', (req, res) => {
       Player.updateOne({
         _id: playerId,
       }, {
-        $set: data,
+        $set: playerInfo,
       }, (err, updatedPlayer) => {
         if (err) {
           logger.error(err);
@@ -198,13 +204,15 @@ router.put('/:id', (req, res) => {
     async.waterfall(tasks, (err, playerData) => {
       if (err) {
         logger.error(err);
-        res.status(404).json({
+        res.status(400).json({
           success: false,
           err,
+          message: 'Bad Credentials',
         });
       } else {
         res.status(200).json({
           success: true,
+          message: 'Successfully updated!',
           data: {
             token: jwt.sign({
               user: playerData,

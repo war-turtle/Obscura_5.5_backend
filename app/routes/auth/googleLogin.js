@@ -5,7 +5,7 @@ import {
 } from '../../../log';
 
 const verify = (loginInfo, callback) => {
-  http.httpGet(`${config.api.google}${loginInfo.id_token}`, (err, res) => {
+  http.httpGet(`${config.api.google}${loginInfo.token}`, (err, res) => {
     if (err) {
       logger.error(err);
       return callback(err, null);

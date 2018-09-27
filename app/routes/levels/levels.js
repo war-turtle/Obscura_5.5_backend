@@ -6,6 +6,7 @@ import {
 import Level from '../../models/level';
 import levelController from './levelController';
 import Team from '../../models/team';
+import AdminChecker from '../../global/middlewares/adminChecker';
 
 const router = express.Router();
 
@@ -117,9 +118,10 @@ router.get('/', (req, res) => {
   async.waterfall(taskDecider(req.query.action), (err, response) => {
     if (err) {
       logger.error(err);
-      res.status().json({
+      res.status(500).json({
         err,
         success: false,
+        message: 'Try Again',
       });
     } else {
       res.status(200).json({
@@ -160,7 +162,7 @@ router.get('/', (req, res) => {
  *         description: level with specific id not found
  */
 
-router.get('/:id', (req, res) => {
+router.get('/:id', AdminChecker, (req, res) => {
   const levelId = req.params.id;
   Level.findById(levelId, (err, level) => {
     if (err) {
@@ -214,7 +216,7 @@ router.get('/:id', (req, res) => {
  *         description: Unauthorised request
  */
 
-router.post('/', (req, res) => {
+router.post('/', AdminChecker, (req, res) => {
   const levelData = new Level(req.body);
   levelData.save((err, response) => {
     if (err) {
@@ -287,7 +289,7 @@ router.post('/', (req, res) => {
  *         description: Unauthorized request
  */
 
-router.put('/:id', (req, res) => {
+router.put('/:id', AdminChecker, (req, res) => {
   Level.updateOne({
     _id: req.params.id,
   }, {
@@ -495,6 +497,7 @@ router.post('/:alias', (req, res) => {
       res.json({
         success: true,
         ansCorrect: false,
+        message: 'Wrong Answer',
       });
     } else {
       async.waterfall(task1, (err, level) => {

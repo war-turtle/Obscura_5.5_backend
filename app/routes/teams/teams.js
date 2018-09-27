@@ -7,6 +7,9 @@ import {
 import Team from '../../models/team';
 import Player from '../../models/player';
 import config from '../../../config';
+import global from '../../global/middlewares/global';
+
+const fs = require('fs');
 
 const router = express.Router();
 
@@ -245,6 +248,7 @@ router.post('/', (req, res) => {
       res.json({
         success: false,
         err,
+        message: 'Try Again!',
       });
     } else {
       res.json({
@@ -316,7 +320,7 @@ router.put('/:id', (req, res) => {
       }, {
         requests: {
           $elemMatch: {
-            _id: reqId,
+            requester_id: reqId,
           },
         },
       }, (err, request) => {
@@ -349,7 +353,6 @@ router.put('/:id', (req, res) => {
             return callback(err1, null);
           }
           return callback(null, player);
-          // TODO:= update the JWT of the requester
         });
       });
     },
@@ -387,7 +390,29 @@ router.put('/:id', (req, res) => {
           logger.error(err);
           return callback(err, null);
         }
-        return callback(null, response);
+        return callback(null, player);
+      });
+    },
+
+    // fetching the player for making jwt token
+    (player, callback) => {
+      Player.findById(player._id, (err, u) => {
+        if (err) {
+          logger.error(err);
+          return callback(err, null);
+        }
+        const jsonData = require('../../../session.json');
+        Object.keys(jsonData).map((user) => {
+          if (jsonData[user] === u.username) {
+            const token = jwt.sign({
+              user: u,
+            }, config.app.WEB_TOKEN_SECRET, {
+              expiresIn: config.app.jwt_expiry_time,
+            });
+            global.Socket.broadcast.to(user).emit('accepted', token);
+          }
+        });
+        return callback(null, player);
       });
     },
   ];
@@ -459,7 +484,7 @@ router.put('/:id', (req, res) => {
       }, {
         $pull: {
           requests: {
-            _id: req.body.reqId,
+            requester_id: req.body.reqId,
           },
         },
       }, (err, response) => {
@@ -491,6 +516,7 @@ router.put('/:id', (req, res) => {
       res.json({
         success: false,
         err,
+        message: 'Try Again',
       });
     } else {
       res.json({

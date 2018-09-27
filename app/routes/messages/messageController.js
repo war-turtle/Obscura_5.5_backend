@@ -8,12 +8,13 @@ const sendEmail = (user, data, callback) => {
   nodemailer.createTestAccount((err, account) => {
   // create reusable transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false, // true for 465, false for other ports
+      service: 'Gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // true for 465, false for other ports
       auth: {
-        user: account.user, // generated ethereal user
-        pass: account.pass, // generated ethereal password
+        user: config.email_cred.from, // generated ethereal user
+        pass: config.email_cred.frompassword, // generated ethereal password
       },
     });
 
@@ -29,6 +30,7 @@ const sendEmail = (user, data, callback) => {
     // send mail with defined transport object
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
+        console.log(error);
         return callback(error, null);
       }
       console.log('Message sent: %s', info.messageId);

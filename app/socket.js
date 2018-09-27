@@ -1,7 +1,7 @@
 import socket from 'socket.io';
+import global from './global/middlewares/global';
 
 const fs = require('fs');
-// const jsonData = require('../session.json');
 
 
 const check = (obj, username) => {
@@ -21,7 +21,7 @@ const sockets = (server) => {
   fs.writeFileSync('session.json', data);
   io.on('connection', (Socket) => {
     const jsonData = require('../session.json');
-
+    global.Socket = Socket;
     Socket.on('disconnect', () => {
       delete jsonData[Socket.id];
       data = JSON.stringify(jsonData);
@@ -30,6 +30,7 @@ const sockets = (server) => {
 
     Socket.on('checkUser', (user) => {
       console.log(jsonData);
+      // Socket.join(user._id);
       if (check(jsonData, user.username)) {
         if (jsonData[Socket.id] !== user.username) {
           Socket.emit('stopUser', null);
