@@ -444,9 +444,6 @@ router.post('/:alias', (req, res) => {
             Team.update({
               'players._id': req.user._id,
             }, {
-              $inc: {
-                'players.$.level_cleared': 1,
-              },
               $set: {
                 level_no: newLevelNo,
                 sub_levels: newSubLevelNo,

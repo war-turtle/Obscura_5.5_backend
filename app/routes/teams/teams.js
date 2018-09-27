@@ -9,8 +9,6 @@ import Player from '../../models/player';
 import config from '../../../config';
 import global from '../../global/middlewares/global';
 
-const fs = require('fs');
-
 const router = express.Router();
 
 /**
@@ -183,7 +181,10 @@ router.get('/:id', (req, res) => {
  */
 
 router.post('/', (req, res) => {
-  const teamData = req.body;
+  const teamData = {};
+  teamData.name = req.body.name;
+  teamData.secretKey = req.body.secretKey;
+  teamData.picture = req.body.picture;
   teamData.admin_id = req.user._id;
   teamData.players = [{
     _id: req.user._id,

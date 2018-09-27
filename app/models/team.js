@@ -36,6 +36,10 @@ const TeamSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  secretKey: {
+    type: String,
+    required: true,
+  },
   admin_id: {
     type: String,
     required: true,
