@@ -14,13 +14,15 @@ const MongoConnect = () => {
   //   useNewUrlParser: true,
   // };
 
-  const db = mongoose.connect(configDatabase.db.url, (error) => {
-    if (error) {
-      console.log(`Mongoose default connection error: ${error}`);
-    } else {
-      console.log('mongo Connected :)');
-    }
-  });
+  // const db = mongoose.connect(configDatabase.db.url, (error) => {
+  //   if (error) {
+  //     console.log(`Mongoose default connection error: ${error}`);
+  //   } else {
+  //     console.log('mongo Connected :)');
+  //   }
+  // });
+
+  const db = mongoose.connect(configDatabase.db.url, { useNewUrlParser: true });
   // If the connection throws an error
   mongoose.connection.on('error', (err) => {
     console.log(`Mongoose default connection error: ${err}`);
