@@ -87,6 +87,9 @@ router.post('/login', (req, res) => {
           return callback(err, null);
         }
         if (!player) {
+          if (!user.email) {
+            return callback('Try with another account', null);
+          }
           authController.createPlayer(user, (err1, newPlayer) => {
             if (err1) {
               logger.error(err1);
