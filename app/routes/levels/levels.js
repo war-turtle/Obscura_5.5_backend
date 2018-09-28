@@ -368,6 +368,7 @@ router.post('/:alias', (req, res) => {
     (callback) => {
       levelController.getAliasLevel(req.user, levelAlias, (err, data) => {
         if (err) {
+          console.log(err);
           return callback(err, null);
         }
         req.level = data.level;
@@ -394,6 +395,7 @@ router.post('/:alias', (req, res) => {
     (callback) => {
       Level.findById(req.level._id, (err, level) => {
         if (err) {
+          console.log(err);
           return callback(err, null);
         }
         return callback(null, level);
@@ -418,51 +420,49 @@ router.post('/:alias', (req, res) => {
       }
       if (teamLevelNo === level.level_no && req.sub_level.sub_level_no === teamSubLevelNo) {
         // updating team
-        if (!req.user.admin) {
-          if (req.sub_level.sub_level_no === level.sub_levels.length) {
-            Team.update({
-              'players._id': req.user._id,
-            }, {
-              $inc: {
-                'players.$.level_cleared': 1,
-              },
-              $set: {
-                level_no: newLevelNo,
-                sub_levels: newSubLevelNo,
-                updated_at: new Date(),
-              },
-              $push: {
-                timeline,
-              },
+        if (req.sub_level.sub_level_no === level.sub_levels.length) {
+          Team.update({
+            'players._id': req.user._id,
+          }, {
+            $inc: {
+              'players.$.level_cleared': 1,
             },
-            (err, team) => {
-              if (err) {
-                return callback(err, null);
-              }
-              return callback(null, {
-                newLevelNo,
-                newSubLevelNo,
-              });
-            });
-          } else {
-            Team.update({
-              'players._id': req.user._id,
-            }, {
-              $set: {
-                level_no: newLevelNo,
-                sub_levels: newSubLevelNo,
-              },
+            $set: {
+              level_no: newLevelNo,
+              sub_levels: newSubLevelNo,
+              updated_at: new Date(),
             },
-            (err, team) => {
-              if (err) {
-                return callback(err, null);
-              }
-              return callback(null, {
-                newLevelNo,
-                newSubLevelNo,
-              });
+            $push: {
+              timeline,
+            },
+          },
+          (err, team) => {
+            if (err) {
+              return callback(err, null);
+            }
+            return callback(null, {
+              newLevelNo,
+              newSubLevelNo,
             });
-          }
+          });
+        } else {
+          Team.update({
+            'players._id': req.user._id,
+          }, {
+            $set: {
+              level_no: newLevelNo,
+              sub_levels: newSubLevelNo,
+            },
+          },
+          (err, team) => {
+            if (err) {
+              return callback(err, null);
+            }
+            return callback(null, {
+              newLevelNo,
+              newSubLevelNo,
+            });
+          });
         }
       } else {
         return callback(null, {
