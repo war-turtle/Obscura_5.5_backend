@@ -451,7 +451,6 @@ router.post('/:alias', (req, res) => {
               $set: {
                 level_no: newLevelNo,
                 sub_levels: newSubLevelNo,
-                updated_at: new Date(),
               },
             },
             (err, team) => {

@@ -56,6 +56,7 @@ const TeamSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  updated_at: Date,
   players: {
     type: [{
       _id: String,

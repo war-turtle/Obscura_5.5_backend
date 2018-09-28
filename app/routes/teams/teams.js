@@ -186,6 +186,7 @@ router.post('/', (req, res) => {
   teamData.secretKey = req.body.secretKey;
   teamData.picture = req.body.picture;
   teamData.admin_id = req.user._id;
+  teamData.updated_at = new Date();
   teamData.players = [{
     _id: req.user._id,
     username: req.user.username,
