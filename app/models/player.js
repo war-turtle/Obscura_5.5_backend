@@ -59,7 +59,7 @@ const PlayerSchema = mongoose.Schema({
 
   phone: {
     type: Number,
-    unique: true,
+    // unique: true,
   },
 
   college: String,
