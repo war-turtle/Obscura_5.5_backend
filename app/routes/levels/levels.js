@@ -481,8 +481,11 @@ router.post('/:alias', (req, res) => {
         if (err) {
           return callback(err, null);
         }
-        if (level.sub_levels.length) {
-          return callback(null, { alias: level.sub_levels[0].url_alias });
+        if (level) {
+          if (level.sub_levels.length) {
+            return callback(null, { alias: level.sub_levels[0].url_alias });
+          }
+          return callback('NO LEVEL FOUND', null);
         }
         return callback('NO LEVEL FOUND', null);
       });
