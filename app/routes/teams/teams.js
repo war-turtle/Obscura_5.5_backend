@@ -335,6 +335,9 @@ router.put('/:id', (req, res) => {
     },
     // getting user details
     (request, callback) => {
+      if (!request.requests.length) {
+        return callback('no requests', null);
+      }
       Player.findById(request.requests[0].requester_id, (err, player) => {
         if (err) {
           logger.error(err);
