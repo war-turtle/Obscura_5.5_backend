@@ -1,7 +1,7 @@
 import express from 'express';
 import async from 'async';
 import jwt from 'jsonwebtoken';
-import logger from '../../../log';
+import { logger } from '../../../log';
 import googleAuth from './googleLogin';
 import facebookAuth from './facebookLogin';
 import Player from '../../models/player';
