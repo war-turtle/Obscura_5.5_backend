@@ -65,11 +65,13 @@ router.get('/', (req, res) => {
         }
         const levelList = [];
         levels.map((l) => {
-          if (l.sub_levels.length) {
-            levelList.push({
-              levelNo: l.level_no,
-              url_alias: l.sub_levels[0].url_alias,
-            });
+          if (l.sub_levels) {
+            if (l.sub_levels.length) {
+              levelList.push({
+                levelNo: l.level_no,
+                url_alias: l.sub_levels[0].url_alias,
+              });
+            }
           }
         });
         return callback(null, levelList);
