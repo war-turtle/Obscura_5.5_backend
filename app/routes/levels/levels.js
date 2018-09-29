@@ -297,7 +297,7 @@ router.post('/', AdminChecker, (req, res) => {
  */
 
 router.put('/:id', AdminChecker, (req, res) => {
-  Level.updateOne({
+  Level.update({
     _id: req.params.id,
   }, {
     $push: {

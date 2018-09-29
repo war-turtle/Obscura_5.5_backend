@@ -209,7 +209,7 @@ router.post('/', (req, res) => {
     },
 
     (teamDetails, callback) => {
-      Player.updateOne({
+      Player.update({
         _id: req.user._id,
       }, {
         $set: {
@@ -347,7 +347,7 @@ router.put('/:id', (req, res) => {
         if (player.team_id) {
           return callback('Player has already joined a team', null);
         }
-        Player.updateOne({
+        Player.update({
           _id: request.requests[0].requester_id,
         }, {
           $set: {
@@ -364,7 +364,7 @@ router.put('/:id', (req, res) => {
     },
 
     (player, callback) => {
-      Team.updateOne({
+      Team.update({
         _id: req.params.id,
       }, {
         $push: {
@@ -464,7 +464,7 @@ router.put('/:id', (req, res) => {
     },
 
     (player, callback) => {
-      Team.updateOne({
+      Team.update({
         _id: req.params.id,
       }, {
         $push: {

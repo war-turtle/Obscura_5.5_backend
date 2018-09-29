@@ -176,7 +176,7 @@ router.put('/:id', (req, res) => {
 
     // updating the player details
     (condition, callback) => {
-      Player.updateOne({
+      Player.update({
         _id: playerId,
       }, {
         $set: playerInfo,
