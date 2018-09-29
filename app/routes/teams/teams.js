@@ -68,7 +68,7 @@ router.get('/', (req, res) => {
     },
 
     (callback) => {
-      Team.countDocuments({}, (err, count) => {
+      Team.count({}, (err, count) => {
         if (err) {
           return callback(err, null);
         }
