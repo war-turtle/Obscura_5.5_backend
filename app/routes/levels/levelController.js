@@ -37,7 +37,7 @@ const getAliasLevel = (user, alias, callback) => {
           return callback(err, null);
         }
         if (level.sub_levels.length) {
-          return callback(err, { level, team });
+          return callback(null, { level, team });
         }
         return callback('No level found', null);
       });
