@@ -55,7 +55,7 @@ router.get('/', (req, res) => {
   } : null;
   const task = [
     (callback) => {
-      Team.find({}, constraints.LeaderboardContraint)
+      Team.find()
         .sort(options)
         .skip(parseInt(req.query.skip, 10))
         .limit(parseInt(req.query.limit, 10))
