@@ -8,6 +8,7 @@ import Team from '../../models/team';
 import Player from '../../models/player';
 import config from '../../../config';
 import global from '../../global/middlewares/global';
+import constraints from '../../helper/constraints';
 
 const router = express.Router();
 
@@ -54,7 +55,7 @@ router.get('/', (req, res) => {
   } : null;
   const task = [
     (callback) => {
-      Team.find()
+      Team.find(constraints.LeaderboardContraint)
         .sort(options)
         .skip(parseInt(req.query.skip, 10))
         .limit(parseInt(req.query.limit, 10))
