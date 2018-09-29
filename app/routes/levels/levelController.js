@@ -30,7 +30,7 @@ const getAliasLevel = (user, alias, callback) => {
         },
       }, {
         'sub_levels.$': 1,
-      },
+      }, constraints.ansContraint
       (err, level) => {
         if (err) {
           logger.error(err);
