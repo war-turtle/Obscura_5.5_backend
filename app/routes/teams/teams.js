@@ -190,6 +190,7 @@ router.post('/', (req, res) => {
   teamData.players = [{
     _id: req.user._id,
     username: req.user.username,
+    picture: req.user.picture,
   }];
 
   const tasks = [
