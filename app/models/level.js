@@ -53,7 +53,6 @@ const LevelSchema = mongoose.Schema({
     url_alias: {
       type: String,
       required: true,
-      unique: true,
     },
     picture: {
       type: [String],
