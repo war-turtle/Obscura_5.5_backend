@@ -51,8 +51,10 @@ router.get('/', (req, res) => {
           return callback(err, null);
         }
         const subLevel = level.level.sub_levels.filter(obj => obj.url_alias === req.query.alias)[0]; // always 0 index because alias is unique
-        delete subLevel.ans;
-        return callback(null, subLevel);
+
+        const s = JSON.parse(JSON.stringify(subLevel));
+        delete s.ans;
+        return callback(null, s);
       });
     },
   ];
