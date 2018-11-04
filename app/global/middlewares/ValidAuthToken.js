@@ -6,7 +6,6 @@ import { logger } from '../../../log';
 
 const ValidAuthToken = (req, res, next) => {
   const token = req.headers.authorization;
-
   if (token) {
     jwt.verify(token, configServer.app.WEB_TOKEN_SECRET, (err, decodedUser) => {
       if (err) {

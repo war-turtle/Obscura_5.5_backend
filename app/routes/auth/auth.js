@@ -1,54 +1,57 @@
 import express from 'express';
 import async from 'async';
 import jwt from 'jsonwebtoken';
-import { logger } from '../../../log';
+import {
+  logger,
+} from '../../../log';
 import googleAuth from './googleLogin';
 import facebookAuth from './facebookLogin';
 import Player from '../../models/player';
 import authController from './authController';
 import config from '../../../config';
+import { store } from '../../middleware';
 
 const router = express.Router();
 
 /**
-   * @swagger
-   * /auth/login:
-   *   post:
-   *     parameters:
-   *       - in: body
-   *         name: login credentials
-   *         required: true
-   *         description: for user login or signup
-   *         schema:
-   *           type: object
-   *           properties:
-   *              id_token:
-   *                type: string
-   *              provider:
-   *                type: string
-   *     tags:
-   *       - auth
-   *     description: Creates new player or login
-   *     produces:
-   *       - application/json
-   *     responses:
-   *       200:
-   *         description: Player Logged in
-   *         schema:
-   *           type: object
-   *           properties:
-   *              success:
-   *                 type: boolean
-   *              data:
-   *                 type: object
-   *                 properties:
-   *                    token:
-   *                       type: string
-   *       400:
-   *         description: User already exists
-   *       401:
-   *         description: Unauthorised request
-   */
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     parameters:
+ *       - in: body
+ *         name: login credentials
+ *         required: true
+ *         description: for user login or signup
+ *         schema:
+ *           type: object
+ *           properties:
+ *              id_token:
+ *                type: string
+ *              provider:
+ *                type: string
+ *     tags:
+ *       - auth
+ *     description: Creates new player or login
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Player Logged in
+ *         schema:
+ *           type: object
+ *           properties:
+ *              success:
+ *                 type: boolean
+ *              data:
+ *                 type: object
+ *                 properties:
+ *                    token:
+ *                       type: string
+ *       400:
+ *         description: User already exists
+ *       401:
+ *         description: Unauthorised request
+ */
 
 router.post('/login', (req, res) => {
   const loginData = req.body;
@@ -75,6 +78,18 @@ router.post('/login', (req, res) => {
       } else {
         return callback('provider not given', null);
       }
+    },
+
+    (user, callback) => {
+      store.all((err, sessions) => {
+        console.log(sessions, 'auth waale');
+        if (sessions.filter(x => x.email === user.email).length) {
+          console.log('here', sessions.filter(x => x.email === user.email));
+          return callback('Already active', null);
+        }
+        console.log('here 2');
+        return callback(null, user);
+      });
     },
 
     // Checking the user in database amd further processing
@@ -105,6 +120,7 @@ router.post('/login', (req, res) => {
 
     // Generating the jwt token
     (user, callback) => {
+      req.session.email = user.email;
       const token = jwt.sign({
         user,
       }, config.app.WEB_TOKEN_SECRET, {
@@ -121,16 +137,40 @@ router.post('/login', (req, res) => {
       res.status(401).json({
         err,
         success: false,
+        singleDevice: err !== 'Already active',
       });
     } else {
       res.status(200).json({
         success: true,
         data: {
+          singleDevice: true,
           token: response,
         },
       });
     }
   });
 });
+
+router.get('/logout', (req, res) => {
+  console.log('------------------------------------------------', req.sessionID);
+  // req.session.destroy();
+  req.session = null;
+  console.log('------------------------------------------------', req.sessionID);
+  store.destroy(req.sessionID, (err) => {
+    if (err) {
+      res.json({
+        success: false,
+      });
+    } else {
+      store.all((err, sessions) => {
+        console.log(sessions);
+        res.json({
+          success: true,
+        });
+      });
+    }
+  });
+});
+
 
 export default router;

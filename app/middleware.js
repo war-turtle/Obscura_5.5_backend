@@ -1,20 +1,21 @@
 // Middleware for Application
-import passport from 'passport';
 import bodyParser from 'body-parser';
 import expressSession from 'express-session';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import rateLimit from 'express-rate-limit';
 import CsrfMiddleware from './global/middlewares/csrfMidlleware';
 import EmptyContentMiddleware from './global/middlewares/EmptyContent';
 import ContentTypeMiddleware from './global/middlewares/ContentType';
 import configServer from '../config';
 import { stream } from '../log';
 
+const JsonStore = require('express-session-json')(expressSession);
+const cbor = require('cbor-sync');
+
+const store = new JsonStore();
 
 const middleware = (app) => {
-  app.use(passport.initialize());
   app.set('port', process.env.PORT || configServer.app.PORT);
   // adding security fixes
   app.disable('x-powered-by');
@@ -31,12 +32,26 @@ const middleware = (app) => {
   //   max: 100,
   //   message: 'Too many requeets',
   // }));
+  app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  }));
+
   app.use(expressSession({
     name: 'SESS_ID',
     secret: configServer.app.SESSION_SECRET,
     resave: true,
+    store,
     saveUninitialized: true,
+    fileExtension: '.cbor',
+    encoding: null,
+    encoder: cbor.encode,
+    decoder: cbor.decode,
+    cookie: { maxAge: 20000 },
   }));
+
+  global.store = store;
+
   app.use(bodyParser.urlencoded({
     extended: false,
   })); // parse application/x-www-form-urlencoded
@@ -45,7 +60,7 @@ const middleware = (app) => {
    * enable CORS support. // Cross-Origin Request Support
    */
   // register all custom Middleware
-  app.use(cors());
+
   app.use(morgan('combined', {
     stream,
   }));
@@ -54,4 +69,7 @@ const middleware = (app) => {
   app.use(CsrfMiddleware);
 };
 
-export default middleware;
+export {
+  middleware,
+  store,
+};

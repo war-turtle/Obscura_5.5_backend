@@ -80,12 +80,12 @@ router.get('/', (req, res) => {
 
   async.parallel(task, (err, response) => {
     if (err) {
-      res.json({
+      res.status(500).json({
         success: false,
         err,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: {
           count: response[1],
@@ -130,12 +130,12 @@ router.get('/:id', (req, res) => {
   Team.findById(req.params.id, (err, team) => {
     if (err) {
       logger.error(err);
-      res.json({
+      res.status(500).json({
         success: false,
         err,
       });
     } else {
-      res.json({
+      res.status(200).json({
         success: true,
         data: team,
       });
