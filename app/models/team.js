@@ -34,6 +34,7 @@ const TeamSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    // unique: true,
   },
   secretKey: {
     type: String,
@@ -61,6 +62,7 @@ const TeamSchema = new mongoose.Schema({
       _id: String,
       username: {
         type: String,
+        // unique: true,
       },
       level_cleared: {
         type: Number,
@@ -73,7 +75,6 @@ const TeamSchema = new mongoose.Schema({
     type: [{
       requester_id: {
         type: String,
-        // unique: true,
       },
       created_at: {
         type: Date,
@@ -87,7 +88,6 @@ const TeamSchema = new mongoose.Schema({
     type: [{
       level_no: {
         type: Number,
-        // unique: true,
       },
       cleared_at: Date,
     }],

@@ -158,12 +158,14 @@ router.get('/:id', (req, res) => {
 router.put('/:id', (req, res) => {
   const playerId = req.user._id;
   const data = req.body;
-  const playerInfo = {};
-  playerInfo.phone = data.phone;
-  playerInfo.username = data.username;
-  playerInfo.college = data.college;
-  playerInfo.onboard = true;
-  data.onboard = true;
+
+  const playerInfo = {
+    phone: data.phone,
+    username: data.username,
+    college: data.college,
+    onboard: true,
+    picture: data.picture,
+  };
 
   const tasks = [
 

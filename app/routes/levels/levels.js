@@ -48,9 +48,12 @@ router.get('/', (req, res) => {
     (callback) => {
       levelController.getAliasLevel(req.user, req.query.alias, (err, level) => {
         if (err) {
+          console.log(err);
           return callback(err, null);
         }
-        const subLevel = level.level.sub_levels.filter(obj => obj.url_alias === req.query.alias)[0]; // always 0 index because alias is unique
+        const subLevel = level.level.sub_levels.filter(
+          obj => obj.url_alias === req.query.alias,
+        )[0]; // always 0 index because alias is unique
 
         const s = JSON.parse(JSON.stringify(subLevel));
         delete s.ans;
@@ -63,6 +66,7 @@ router.get('/', (req, res) => {
     (callback) => {
       levelController.getAllLevels(req.user, (err, levels) => {
         if (err) {
+          console.log(err);
           return callback(err, null);
         }
         const levelList = [];
@@ -86,6 +90,7 @@ router.get('/', (req, res) => {
       Team.findById(req.user.team_id, (err, team) => {
         if (err) {
           logger.error(err);
+          console.log(err);
           return callback(err, null);
         }
         if (!team) {
@@ -98,6 +103,7 @@ router.get('/', (req, res) => {
     (team, callback) => {
       levelController.getLevelAlias(team.level_no, team.sub_levels, (err, level) => {
         if (err) {
+          console.log(err);
           return callback(err, null);
         }
         if (level) {
@@ -127,6 +133,7 @@ router.get('/', (req, res) => {
   async.waterfall(taskDecider(req.query.action), (err, response) => {
     if (err) {
       logger.error(err);
+      console.log(err);
       res.status(500).json({
         err,
         success: false,
@@ -365,8 +372,8 @@ router.put('/:id', AdminChecker, (req, res) => {
 router.post('/:alias', (req, res) => {
   const userAns = req.body.ans;
   const levelAlias = req.params.alias;
-  let teamLevelNo;
-  let teamSubLevelNo;
+  let teamLevelNumber;
+  let teamSubLevelNumber;
 
   const tasks = [
     // getting level from the alias
@@ -379,8 +386,8 @@ router.post('/:alias', (req, res) => {
         req.level = data.level;
         const subLevel = data.level.sub_levels.filter(obj => obj.url_alias === levelAlias)[0]; // always 0 index because alias is unique
         req.sub_level = subLevel;
-        teamLevelNo = data.teamLevelNo;
-        teamSubLevelNo = data.teamSubLevelNo;
+        teamLevelNumber = data.teamLevelNo;
+        teamSubLevelNumber = data.teamSubLevelNo;
         return callback(null, subLevel);
       });
     },
@@ -423,7 +430,7 @@ router.post('/:alias', (req, res) => {
         newSubLevelNo = req.sub_level.sub_level_no + 1;
         timeline = {};
       }
-      if (teamLevelNo === level.level_no && req.sub_level.sub_level_no === teamSubLevelNo) {
+      if (teamLevelNumber === level.level_no && req.sub_level.sub_level_no === teamSubLevelNumber) {
         // updating team
         if (req.sub_level.sub_level_no === level.sub_levels.length) {
           Team.update({
@@ -441,7 +448,7 @@ router.post('/:alias', (req, res) => {
               timeline,
             },
           },
-          (err, team) => {
+          (err) => {
             if (err) {
               return callback(err, null);
             }
@@ -459,7 +466,7 @@ router.post('/:alias', (req, res) => {
               sub_levels: newSubLevelNo,
             },
           },
-          (err, team) => {
+          (err) => {
             if (err) {
               return callback(err, null);
             }
