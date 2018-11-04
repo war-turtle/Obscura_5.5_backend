@@ -22,7 +22,8 @@ const MongoConnect = () => {
   //   }
   // });
 
-  const db = mongoose.connect(configDatabase.db.url, { useNewUrlParser: true });
+  const db = mongoose.connect(configDatabase.db.url, { useNewUrlParser: true }, () => {console.log("connected")});
+
   // If the connection throws an error
   mongoose.connection.on('error', (err) => {
     console.log(`Mongoose default connection error: ${err}`);

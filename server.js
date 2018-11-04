@@ -1,5 +1,3 @@
-
-
 import 'app-module-path/register';
 import { addPath } from 'app-module-path';
 import path from 'path';
@@ -19,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // invoke routes, MIddleware, Mongo connect here
 MongoConnect();
 AppMiddleware(app);
-AppRoutes(app, express);
+AppRoutes(app);
 swagger(app);
 // ---------------------------------------------//
 const server = app.listen(config.app.PORT);
