@@ -11,9 +11,10 @@ import configServer from '../config';
 import { stream } from '../log';
 
 const JsonStore = require('express-session-json')(expressSession);
-const cbor = require('cbor-sync');
+// const cbor = require('cbor-sync');
+// const FileStore = require('session-file-store')(expressSession);
 
-const store = new JsonStore();
+const store = new JsonStore({ path: 'session/'});
 
 const middleware = (app) => {
   app.set('port', process.env.PORT || configServer.app.PORT);
@@ -42,15 +43,11 @@ const middleware = (app) => {
     secret: configServer.app.SESSION_SECRET,
     resave: true,
     store,
-    saveUninitialized: true,
-    fileExtension: '.cbor',
-    encoding: null,
-    encoder: cbor.encode,
-    decoder: cbor.decode,
-    cookie: { maxAge: 20000 },
+    saveUninitialized: false,
   }));
 
   global.store = store;
+  store.clear();
 
   app.use(bodyParser.urlencoded({
     extended: false,
@@ -71,5 +68,4 @@ const middleware = (app) => {
 
 export {
   middleware,
-  store,
 };

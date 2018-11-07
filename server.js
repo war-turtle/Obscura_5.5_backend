@@ -15,18 +15,14 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 // ---------------------------------------------//
 // invoke routes, MIddleware, Mongo connect here
-MongoConnect();
-AppMiddleware(app);
+middleware(app);
 AppRoutes(app);
-swagger(app);
+// swagger(app);
 // ---------------------------------------------//
 const server = app.listen(config.app.PORT);
 console.log(`app running on ${config.app.PORT}`);
 sockets(server);
 MongoConnect();
 
-// Clear all session on api restart
-global.store.clear();
-
-
 export default app;
+ 
