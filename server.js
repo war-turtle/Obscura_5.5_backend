@@ -1,5 +1,3 @@
-
-
 import 'app-module-path/register';
 import { addPath } from 'app-module-path';
 import path from 'path';
@@ -18,16 +16,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ---------------------------------------------//
 // invoke routes, MIddleware, Mongo connect here
 middleware(app);
-AppRoutes(app, express);
-swagger(app);
+AppRoutes(app);
+// swagger(app);
 // ---------------------------------------------//
 const server = app.listen(config.app.PORT);
 console.log(`app running on ${config.app.PORT}`);
 sockets(server);
 MongoConnect();
 
-// Clear all session on api restart
-global.store.clear();
-
-
 export default app;
+ 
