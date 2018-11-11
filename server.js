@@ -1,7 +1,7 @@
+import express from 'express';
 import 'app-module-path/register';
 import { addPath } from 'app-module-path';
 import path from 'path';
-import express from 'express';
 import config from './config';
 import MongoConnect from './app/mongoose';
 import AppRoutes from './app/routes';
@@ -25,4 +25,3 @@ sockets(server);
 MongoConnect();
 
 export default app;
- 
