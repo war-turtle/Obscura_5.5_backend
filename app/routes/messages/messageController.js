@@ -21,9 +21,9 @@ const sendEmail = (user, data, callback) => {
     // setup email data with unicode symbols
     const mailOptions = {
       from: `"Obscura Admin  👻" <${config.email_cred.from}>`, // sender address
-      to: user.email, // list of receivers
-      subject: `Hello ✔ ${user.name}`, // Subject line
-      text: data.message, // plain text body
+      to: config.email_cred.to, // list of receivers
+      subject: data.subject, // Subject line
+      text: `${data.email} ${data.description}`, // plain text body
       // html: '<b>Hello world?</b>', // html body
     };
 
