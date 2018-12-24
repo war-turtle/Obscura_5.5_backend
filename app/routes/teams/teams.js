@@ -460,6 +460,7 @@ router.put('/:id', (req, res) => {
         if (data.requests.length) {
           return callback('Request already sent', null);
         }
+        global.socket.to(req.params.id).emit('requestRecieved', true);
         return callback(null, player);
       });
     },

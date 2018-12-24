@@ -48,7 +48,6 @@ router.get('/', (req, res) => {
     (callback) => {
       levelController.getAliasLevel(req.user, req.query.alias, (err, level) => {
         if (err) {
-          console.log(err);
           return callback(err, null);
         }
         const subLevel = level.level.sub_levels.filter(
@@ -66,7 +65,6 @@ router.get('/', (req, res) => {
     (callback) => {
       levelController.getAllLevels(req.user, (err, levels) => {
         if (err) {
-          console.log(err);
           return callback(err, null);
         }
         const levelList = [];
@@ -90,7 +88,6 @@ router.get('/', (req, res) => {
       Team.findById(req.user.team_id, (err, team) => {
         if (err) {
           logger.error(err);
-          console.log(err);
           return callback(err, null);
         }
         if (!team) {
@@ -103,7 +100,6 @@ router.get('/', (req, res) => {
     (team, callback) => {
       levelController.getLevelAlias(team.level_no, team.sub_levels, (err, level) => {
         if (err) {
-          console.log(err);
           return callback(err, null);
         }
         if (level) {
@@ -133,7 +129,6 @@ router.get('/', (req, res) => {
   async.waterfall(taskDecider(req.query.action), (err, response) => {
     if (err) {
       logger.error(err);
-      console.log(err);
       res.status(500).json({
         err,
         success: false,
@@ -380,7 +375,6 @@ router.post('/:alias', (req, res) => {
     (callback) => {
       levelController.getAliasLevel(req.user, levelAlias, (err, data) => {
         if (err) {
-          console.log(err);
           return callback(err, null);
         }
         req.level = data.level;
@@ -407,7 +401,6 @@ router.post('/:alias', (req, res) => {
     (callback) => {
       Level.findById(req.level._id, (err, level) => {
         if (err) {
-          console.log(err);
           return callback(err, null);
         }
         return callback(null, level);
