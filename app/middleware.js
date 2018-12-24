@@ -14,7 +14,7 @@ const JsonStore = require('express-session-json')(expressSession);
 // const cbor = require('cbor-sync');
 // const FileStore = require('session-file-store')(expressSession);
 
-const store = new JsonStore({ path: 'session/'});
+const store = new JsonStore({ path: 'session/' });
 
 const middleware = (app) => {
   app.set('port', process.env.PORT || configServer.app.PORT);
@@ -66,6 +66,4 @@ const middleware = (app) => {
   app.use(CsrfMiddleware);
 };
 
-export {
-  middleware,
-};
+export default middleware;

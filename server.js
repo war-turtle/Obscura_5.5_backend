@@ -5,7 +5,7 @@ import path from 'path';
 import config from './config';
 import MongoConnect from './app/mongoose';
 import AppRoutes from './app/routes';
-import { middleware } from './app/middleware';
+import middleware from './app/middleware';
 import swagger from './app/swagger';
 import sockets from './app/socket';
 
