@@ -64,9 +64,9 @@ router.post('/login', (req, res) => {
             logger.error(err);
             return callback(err, null);
           }
-          if(!req.session.hasOwnProperty('email')){
-            req.session.email = user.email;
-          }
+          // if(!req.session.hasOwnProperty('email')){
+          //   req.session.email = user.email;
+          // }
           return callback(null, user);
         });
       } else if (loginData.provider === 'facebook') {
@@ -75,9 +75,9 @@ router.post('/login', (req, res) => {
             logger.error(err);
             return callback(err, null);
           }
-          if(!req.session.hasOwnProperty('email')){
-            req.session.email = user.email;
-          }
+          // if(!req.session.hasOwnProperty('email')){
+          //   req.session.email = user.email;
+          // }
           return callback(null, user);
         });
       } else {
@@ -85,22 +85,19 @@ router.post('/login', (req, res) => {
       }
     },
 
-    (user, callback) => {
-      global.store.all((error, sessions) => {
-        if(error){
-          return callback(error, null);
-        } else {
-          let allUserSession = sessions.filter(session => session.email === user.email);
-          if(allUserSession.length > 0){
-            req.session.destroy(err => {
-              return callback('Already active', null);
-            });
-          } else {
-            return callback(null, user);
-          }
-        }
-      });
-    },
+    // (user, callback) => {
+    //   global.store.all((error, sessions) => {
+    //     if (error) {
+    //       return callback(error, null);
+    //     }
+    //     const allUserSession = sessions.filter(session => session.email === user.email);
+    //     if (allUserSession.length > 0) {
+    //       req.session.destroy(err => callback('Already active', null));
+    //     } else {
+    //       return callback(null, user);
+    //     }
+    //   });
+    // },
 
     // Checking the user in database amd further processing
     (user, callback) => {
@@ -164,10 +161,13 @@ router.post('/login', (req, res) => {
 router.get('/logout', (req, res) => {
   // console.log('------------------------------------------------', req.session);
   // req.session.destroy();
-  req.session.destroy(err => {
-    res.json({
-      success: true,
-    });
+  // req.session.destroy((err) => {
+  //   res.json({
+  //     success: true,
+  //   });
+  // });
+  res.json({
+    success: true,
   });
 });
 
