@@ -9,7 +9,7 @@ import { middleware } from './app/middleware';
 import swagger from './app/swagger';
 import sockets from './app/socket';
 
-addPath(__dirname);
+// addPath(__dirname);
 
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // invoke routes, MIddleware, Mongo connect here
 middleware(app);
 AppRoutes(app);
-// swagger(app);
+swagger(app);
 // ---------------------------------------------//
 const server = app.listen(config.app.PORT);
 console.log(`app running on ${config.app.PORT}`);
