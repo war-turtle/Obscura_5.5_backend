@@ -409,17 +409,15 @@ router.put('/:id', (req, res) => {
           logger.error(err);
           return callback(err, null);
         }
-        const jsonData = require('../../../session.json');
-        Object.keys(jsonData).map((user) => {
-          if (jsonData[user] === u.username) {
-            const token = jwt.sign({
-              user: u,
-            }, config.app.WEB_TOKEN_SECRET, {
-              expiresIn: config.app.jwt_expiry_time,
-            });
-            global.Socket.broadcast.to(user).emit('accepted', token);
-          }
+
+        const token = jwt.sign({
+          user: u,
+        }, config.app.WEB_TOKEN_SECRET, {
+          expiresIn: config.app.jwt_expiry_time,
         });
+        console.log(u.username, 'sent');
+        global.socket.to(u.username).emit('accepted', token);
+        global.socket.join(u.team_id);
         return callback(null, player);
       });
     },
@@ -461,6 +459,7 @@ router.put('/:id', (req, res) => {
           return callback('Request already sent', null);
         }
         global.socket.to(req.params.id).emit('requestRecieved', true);
+        console.log('request sent', req.params.id);
         return callback(null, player);
       });
     },

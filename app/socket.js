@@ -14,8 +14,11 @@ const sockets = (server) => {
       console.log(user.user.team_id);
       socket.join(user.user.team_id);
 
+      socket.join(user.user.username);
+      console.log(io.sockets.adapter.rooms);
+
       Chat.findById(usr.user.team_id).then((msg) => {
-        console.log(msg.messages);
+        // console.log(msg.messages);
         socket.emit('roomJoin', {
           success: true,
           messages: msg.messages,

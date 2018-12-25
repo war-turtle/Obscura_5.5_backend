@@ -7,6 +7,7 @@ import Level from '../../models/level';
 import levelController from './levelController';
 import Team from '../../models/team';
 import AdminChecker from '../../global/middlewares/adminChecker';
+import global from '../../global/middlewares/global';
 
 const router = express.Router();
 
@@ -446,6 +447,7 @@ router.post('/:alias', (req, res) => {
               return callback(err, null);
             }
             return callback(null, {
+              newLevelOpen: true,
               newLevelNo,
               newSubLevelNo,
             });
@@ -464,6 +466,7 @@ router.post('/:alias', (req, res) => {
               return callback(err, null);
             }
             return callback(null, {
+              newLevelOpen: true,
               newLevelNo,
               newSubLevelNo,
             });
@@ -471,6 +474,7 @@ router.post('/:alias', (req, res) => {
         }
       } else {
         return callback(null, {
+          newLevelOpen: false,
           newLevelNo,
           newSubLevelNo,
         });
@@ -479,12 +483,17 @@ router.post('/:alias', (req, res) => {
 
     // getting next level alias
     (data, callback) => {
+      console.log(data);
       levelController.getLevelAlias(data.newLevelNo, data.newSubLevelNo, (err, level) => {
         if (err) {
           return callback(err, null);
         }
         if (level) {
           if (level.sub_levels.length) {
+            console.log(req.user.team_id, data.newLevelOpen, level.sub_levels[0].url_alias);
+            if (data.newLevelOpen) {
+              global.socket.to(req.user.team_id).emit('openNextLevel', level.sub_levels[0].url_alias);
+            }
             return callback(null, { alias: level.sub_levels[0].url_alias });
           }
           return callback('NO LEVEL FOUND', null);

@@ -95,6 +95,7 @@ const getAllLevels = (user, callback) => {
         return callback(null, team);
       });
     },
+
     (team, callback) => {
       const queryCondition = !user.admin ? {
         level_no: {
@@ -112,6 +113,7 @@ const getAllLevels = (user, callback) => {
             l.sub_levels = l.sub_levels.sort((a, b) => a.sub_level_no > b.sub_level_no);
             l.sub_levels = l.sub_levels[0];
           });
+          // console.log(levels);
           return callback(null, levels);
         });
     },
