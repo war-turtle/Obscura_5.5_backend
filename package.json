@@ -7,7 +7,8 @@
     "dev": "NODE_ENV='dev' nodemon --ignore '*.json' app.js",
     "dev_win": "set NODE_ENV=dev&&gulp",
     "prod": "NODE_ENV='prod' pm2 start app.js --name backend",
-    "prod_win": "set NODE_ENV=prod&&gulp"
+    "prod_win": "set NODE_ENV=prod&&gulp",
+    "test": "NODE_ENV='test' mocha --compilers js:babel-core/register --timeout 10000"
   },
   "author": "phoenix",
   "license": "MIT",
@@ -56,5 +57,10 @@
     "swagger-jsdoc": "^1.3.0",
     "winston": "^3.0.0",
     "winston-daily-rotate-file": "^3.3.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.0",
+    "mocha": "^5.2.0"
   }
 }
