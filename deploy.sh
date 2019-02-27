@@ -14,4 +14,4 @@ docker push warturtle/obscura6-backend:latest
 docker push warturtle/obscura6-backend:$SHA
 
 kubectl apply -f kubernetes
-kubectl set image deployment/backend-deployment server=warturtle/obscura6-backend:$SHA
+kubectl set image deployment/backend-deployment backend=warturtle/obscura6-backend:$SHA
