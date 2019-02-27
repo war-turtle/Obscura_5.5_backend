@@ -1,4 +1,6 @@
-sudo snap install kubectl --classic
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
 pip install awscli
 wget https://github.com/kubernetes/kops/releases/download/1.10.0/kops-linux-amd64
 chmod +x kops-linux-amd64
