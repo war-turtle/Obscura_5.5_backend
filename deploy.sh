@@ -7,7 +7,7 @@
 # kops export kubecfg --name ${KOPS_CLUSTER_NAME}
 
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-docker build -t warturtle/obscura6-backend:latest -t warturtle/obscura6-backend:$SHA .
+docker build --build-arg pass_phrase=$PASS_PHRASE -t warturtle/obscura6-backend:latest -t warturtle/obscura6-backend:$SHA .
 docker push warturtle/obscura6-backend:latest
 docker push warturtle/obscura6-backend:$SHA
 

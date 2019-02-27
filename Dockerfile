@@ -7,12 +7,16 @@ RUN apk --no-cache --virtual build-dependencies add \
   make \
   g++
 
+RUN apk add gnupg
+
 COPY package.json .
 RUN npm install
 
 COPY . .
 
-RUN openssl aes-256-cbc -K $encrypted_0d2f5ae301a9_key -iv $encrypted_0d2f5ae301a9_iv -in config.js.enc -out config.js -d
+ARG pass_phrase
+
+RUN gpg --batch --yes --passphrase ${pass_phrase} -o config.js -d config.js.gpg 
 
 EXPOSE 8000
 
