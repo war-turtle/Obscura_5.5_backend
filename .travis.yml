@@ -1,18 +1,15 @@
 sudo: required
 services:
-  - docker
+- docker
 env:
   global:
-    - SHA=$(git rev-parse HEAD)
-
+  - SHA=$(git rev-parse HEAD)
 before_install:
 - openssl aes-256-cbc -K $encrypted_0d2f5ae301a9_key -iv $encrypted_0d2f5ae301a9_iv
   -in config.js.enc -out config.js -d
 - docker build -t warturtle/obscura6-backend .
-
 script:
-  - docker run warturtle/obscura6-backend npm run test
-
+- docker run warturtle/obscura6-backend npm run test
 deploy:
   provider: script
   script: bash deploy.sh

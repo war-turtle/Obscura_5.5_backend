@@ -47,7 +47,7 @@ const middleware = (app) => {
   }));
 
   global.store = store;
-  store.clear();
+  // store.clear();
 
   app.use(bodyParser.urlencoded({
     extended: false,
