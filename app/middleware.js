@@ -34,20 +34,20 @@ const middleware = (app) => {
     credentials: true,
   }));
 
-  app.use(session({
-    name: 'SESS_ID',
-    secret: configServer.app.SESSION_SECRET,
-    resave: true,
-    store,
-    saveUninitialized: false,
-  }));
+  // app.use(session({
+  //   name: 'SESS_ID',
+  //   secret: configServer.app.SESSION_SECRET,
+  //   resave: true,
+  //   store,
+  //   saveUninitialized: false,
+  // }));
 
-  global.store = store;
-  store.clear((err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
+  // global.store = store;
+  // store.clear((err) => {
+  //   if (err) {
+  //     console.log(err);
+  //   }
+  // });
 
   cron.schedule('*/30 * * * *', () => {
     store.clear((err) => {
