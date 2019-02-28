@@ -30,7 +30,7 @@ const middleware = (app) => {
   app.use(helmet.xssFilter()); // set X-XSS-Protection header
   app.enable('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
   app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'http://obscuranitkkr.co.in',
     credentials: true,
   }));
 
