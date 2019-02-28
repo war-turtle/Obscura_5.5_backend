@@ -1,6 +1,5 @@
 // Middleware for Application
 import bodyParser from 'body-parser';
-import expressSession from 'express-session';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -10,11 +9,13 @@ import ContentTypeMiddleware from './global/middlewares/ContentType';
 import configServer from '../config';
 import { stream } from '../log';
 
-const JsonStore = require('express-session-json')(expressSession);
-// const cbor = require('cbor-sync');
-// const FileStore = require('session-file-store')(expressSession);
+const cron = require('node-cron');
 
-const store = new JsonStore({ path: 'session/' });
+// const JsonStore = require('express-session-json')(expressSession);
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+
+const store = new MongoStore({ url: configServer.db.url });
 
 const middleware = (app) => {
   app.set('port', process.env.PORT || configServer.app.PORT);
@@ -28,17 +29,12 @@ const middleware = (app) => {
   app.use(helmet.frameguard()); // set X-Frame-Options header
   app.use(helmet.xssFilter()); // set X-XSS-Protection header
   app.enable('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
-  // app.use(rateLimit({
-  //   windowMs: 15 * 60 * 1000,
-  //   max: 100,
-  //   message: 'Too many requeets',
-  // }));
   app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,
   }));
 
-  app.use(expressSession({
+  app.use(session({
     name: 'SESS_ID',
     secret: configServer.app.SESSION_SECRET,
     resave: true,
@@ -47,7 +43,19 @@ const middleware = (app) => {
   }));
 
   global.store = store;
-  // store.clear();
+  store.clear((err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
+
+  cron.schedule('*/30 * * * *', () => {
+    store.clear((err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  });
 
   app.use(bodyParser.urlencoded({
     extended: false,

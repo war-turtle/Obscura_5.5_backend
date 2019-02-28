@@ -9,6 +9,7 @@ import facebookAuth from './facebookLogin';
 import Player from '../../models/player';
 import authController from './authController';
 import config from '../../../config';
+import Session from '../../models/session';
 
 const router = express.Router();
 
@@ -62,11 +63,12 @@ router.post('/login', (req, res) => {
         googleAuth.verify(loginData, (err, user) => {
           if (err) {
             logger.error(err);
+            console.log(err);
             return callback(err, null);
           }
-          // if(!req.session.hasOwnProperty('email')){
-          //   req.session.email = user.email;
-          // }
+          if (!req.session.hasOwnProperty('email')) {
+            req.session.email = user.email;
+          }
           return callback(null, user);
         });
       } else if (loginData.provider === 'facebook') {
@@ -75,9 +77,9 @@ router.post('/login', (req, res) => {
             logger.error(err);
             return callback(err, null);
           }
-          // if(!req.session.hasOwnProperty('email')){
-          //   req.session.email = user.email;
-          // }
+          if (!req.session.hasOwnProperty('email')) {
+            req.session.email = user.email;
+          }
           return callback(null, user);
         });
       } else {
@@ -85,19 +87,21 @@ router.post('/login', (req, res) => {
       }
     },
 
-    // (user, callback) => {
-    //   global.store.all((error, sessions) => {
-    //     if (error) {
-    //       return callback(error, null);
-    //     }
-    //     const allUserSession = sessions.filter(session => session.email === user.email);
-    //     if (allUserSession.length > 0) {
-    //       req.session.destroy(err => callback('Already active', null));
-    //     } else {
-    //       return callback(null, user);
-    //     }
-    //   });
-    // },
+    (user, callback) => {
+      Session.find({}, (error, sessions) => {
+        if (error) {
+          return callback(error, null);
+        }
+        const string = `{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"email":"${user.email}"}`;
+        const allUserSession = sessions.filter(x => x.session === string);
+        console.log(allUserSession);
+        if (allUserSession.length > 0) {
+          req.session.destroy(err => callback('Already active', null));
+        } else {
+          return callback(null, user);
+        }
+      });
+    },
 
     // Checking the user in database amd further processing
     (user, callback) => {
@@ -159,16 +163,14 @@ router.post('/login', (req, res) => {
 });
 
 router.get('/logout', (req, res) => {
-  // console.log('------------------------------------------------', req.session);
-  // req.session.destroy();
-  // req.session.destroy((err) => {
-  //   res.json({
-  //     success: true,
-  //   });
-  // });
-  res.json({
-    success: true,
+  req.session.destroy((err) => {
+    res.json({
+      success: true,
+    });
   });
+  // res.json({
+  //   success: true,
+  // });
 });
 
 

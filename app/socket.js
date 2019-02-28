@@ -7,15 +7,15 @@ const sockets = (server) => {
   let usr;
 
   io.on('connection', (socket) => {
-    console.log('connected');
+    // console.log('connected');
     global.socket = socket;
     socket.on('joinRoom', (user) => {
       usr = user;
-      console.log(user.user.team_id);
+      // console.log(user.user.team_id);
       socket.join(user.user.team_id);
 
       socket.join(user.user.username);
-      console.log(io.sockets.adapter.rooms);
+      // console.log(io.sockets.adapter.rooms);
 
       Chat.findById(usr.user.team_id).then((msg) => {
         // console.log(msg.messages);

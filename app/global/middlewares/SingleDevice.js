@@ -1,53 +1,31 @@
-const SingleDevice = (req, res, next) => {
-  // global.store.all((error, sessions) => {
-  //   console.log(sessions);
-  //   console.log(req.user);
-  //   if (error) {
-  //     console.log('some error =====================');
-  //   } else {
-  //     const allUserSessions = sessions.filter(session => session.email === req.session.email);
+import Sessions from '../../models/session';
 
-  //     console.log('=========================', allUserSessions);
-  //     if (allUserSessions.length == 0) {
-  //       req.session.email = req.user.email;
-  //     } else if (allUserSessions.length > 1) {
-  //       req.session.destroy((err) => {
-  //         // res.status(403).json({
-  //         //   success: false,
-  //         //   err: 'Already active',
-  //         //   singleDevice: false,
-  //         // });
-  //         console.log('===============================');
-  //         res.status(401).json({
-  //           success: false,
-  //           err: 'Already active',
-  //           SingleDevice: false,
-  //         });
-  //       });
-  //     } else {
-  //       next();
-  //     }
-  //   }
-  // });
-  next();
-  // global.store.all((err, sessions) => {
-  //   const sess = sessions.filter(x => x.email === req.user.email);
-  //   if (sess.length > 1){
-  //     if (sess[0]._sessionid === req.sessionID) {
-  //       next();
-  //     } else {
-  //       console.log('i am stopped :P');
-  //       if (req.session) {
-  //         req.session.destroy();
-  //       }
-  //       res.status(403).json({
-  //         success: false,
-  //         err: 'Already active',
-  //         singleDevice: false,
-  //       });
-  //     }
-  //   }
-  // });
+
+const SingleDevice = (req, res, next) => {
+  Sessions.find({}, (error, sessions) => {
+    const string = `{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"email":"${req.user.email}"}`;
+    const sess = sessions.filter(x => x.session === string);
+    // console.log(sess, sessions);
+    if (sess.length > 1) {
+      if (sess[0]._sessionid === req.sessionID) {
+        console.log(sess[0]._sessionid === req.sessionID, sess[0]._sessionid, req.sessionID);
+        next();
+      } else {
+        console.log('i am stopped :P');
+        if (req.session) {
+          req.session.destroy();
+        }
+        res.status(403).json({
+          success: false,
+          err: 'Already active',
+          singleDevice: false,
+        });
+      }
+    } else {
+      req.session.email = req.user.email;
+      next();
+    }
+  });
 };
 
 
