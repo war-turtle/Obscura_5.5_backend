@@ -9,7 +9,7 @@ import ContentTypeMiddleware from './global/middlewares/ContentType';
 import configServer from '../config';
 import { stream } from '../log';
 
-const cron = require('node-cron');
+// const cron = require('node-cron');
 
 // const JsonStore = require('express-session-json')(expressSession);
 // const session = require('express-session');

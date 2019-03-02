@@ -9,7 +9,6 @@ import facebookAuth from './facebookLogin';
 import Player from '../../models/player';
 import authController from './authController';
 import config from '../../../config';
-import Session from '../../models/session';
 
 const router = express.Router();
 

@@ -5,7 +5,7 @@ import auth from './routes/auth/auth';
 import messages from './routes/messages/messages';
 import requireAuth from './global/middlewares/ValidAuthToken';
 import TimeLimiter from './global/middlewares/timeLimiter';
-import SingleDevice from './global/middlewares/SingleDevice';
+// import SingleDevice from './global/middlewares/SingleDevice';
 
 const router = (app) => {
   app.use('/players', requireAuth, players);
