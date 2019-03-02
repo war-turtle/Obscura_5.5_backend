@@ -15,7 +15,9 @@ docker build --build-arg pass_phrase=$PASS_PHRASE -t warturtle/obscura6-backend:
 docker push warturtle/obscura6-backend:latest
 docker push warturtle/obscura6-backend:$SHA
 
-gpg --batch --yes --passphrase ${PASS_PHRASE} -o obscura.pem -d obscura.pem.gpg
+ls
+
+gpg --batch --yes --passphrase ${PASS_PHRASE} -o obscura.pem -d Obscura_5.5_backend/obscura.pem.gpg
 sudo chmod 400 obscura.pem
 ssh -o "StrictHostKeyChecking no" -i obscura.pem ubuntu@www.obscuranitkkr.co.in sudo docker service update --image warturtle/obscura6-backend:$SHA backend
 # kubectl apply -f kubernetes
