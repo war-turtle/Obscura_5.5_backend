@@ -29,10 +29,19 @@ const middleware = (app) => {
   app.use(helmet.frameguard()); // set X-Frame-Options header
   app.use(helmet.xssFilter()); // set X-XSS-Protection header
   app.enable('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
-  app.use(cors({
-    origin: 'http://www.obscuranitkkr.co.in',
-    credentials: true,
-  }));
+
+  const whitelist = ['http://www.obscuranitkkr.co.in', 'http://obscuranitkkr.co.in'];
+  const corsOptions = {
+    origin: (origin, callback) => {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+  };
+
+  app.use(cors(corsOptions));
 
   // app.use(session({
   //   name: 'SESS_ID',
