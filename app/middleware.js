@@ -12,10 +12,10 @@ import { stream } from '../log';
 const cron = require('node-cron');
 
 // const JsonStore = require('express-session-json')(expressSession);
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+// const session = require('express-session');
+// const MongoStore = require('connect-mongo')(session);
 
-const store = new MongoStore({ url: configServer.db.url });
+// const store = new MongoStore({ url: configServer.db.url });
 
 const middleware = (app) => {
   app.set('port', process.env.PORT || configServer.app.PORT);
@@ -58,13 +58,13 @@ const middleware = (app) => {
   //   }
   // });
 
-  cron.schedule('*/30 * * * *', () => {
-    store.clear((err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
-  });
+  // cron.schedule('*/30 * * * *', () => {
+  //   store.clear((err) => {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //   });
+  // });
 
   app.use(bodyParser.urlencoded({
     extended: false,
