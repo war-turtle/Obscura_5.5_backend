@@ -8,9 +8,13 @@ import EmptyContentMiddleware from './global/middlewares/EmptyContent';
 import ContentTypeMiddleware from './global/middlewares/ContentType';
 import configServer from '../config';
 import { stream } from '../log';
-
 // const cron = require('node-cron');
 
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+// const fs = require('fs');
+
+// fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify([]));
 // const JsonStore = require('express-session-json')(expressSession);
 // const session = require('express-session');
 // const MongoStore = require('connect-mongo')(session);
@@ -35,13 +39,13 @@ const middleware = (app) => {
     credentials: true,
   }));
 
-  // app.use(session({
-  //   name: 'SESS_ID',
-  //   secret: configServer.app.SESSION_SECRET,
-  //   resave: true,
-  //   store,
-  //   saveUninitialized: false,
-  // }));
+  app.use(session({
+    name: 'SESS_ID',
+    secret: configServer.app.SESSION_SECRET,
+    resave: true,
+    store: new FileStore({ path: './sessions' }),
+    saveUninitialized: false,
+  }));
 
   // global.store = store;
   // store.clear((err) => {

@@ -1,6 +1,7 @@
 import express from 'express';
 import async from 'async';
 import jwt from 'jsonwebtoken';
+import fs from 'fs';
 import {
   logger,
 } from '../../../log';
@@ -58,6 +59,7 @@ router.post('/login', (req, res) => {
 
     // Verifying token of the user
     (callback) => {
+      let onlineUsers = JSON.parse(fs.readFileSync('./sessions/onlineUsers.json'));
       if (loginData.provider === 'google') {
         googleAuth.verify(loginData, (err, user) => {
           if (err) {
@@ -65,6 +67,60 @@ router.post('/login', (req, res) => {
             console.log(err);
             return callback(err, null);
           }
+          if (req.session.email) {
+            if (req.session.email === user.email) {
+              let count = 0;
+              onlineUsers.forEach((emails) => {
+                if (emails === user.email) {
+                  count += 1;
+                }
+              });
+              if (count > 1) {
+                onlineUsers = onlineUsers.filter((elem) => {
+                  if (elem === user.email) {
+                    return false;
+                  }
+                  return true;
+                });
+                fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify(onlineUsers));
+                req.session.destroy();
+                return callback('log both out', null);
+              }
+              req.session.email = user.email;
+              if (count === 0) { onlineUsers.push(user.email); }
+              fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify(onlineUsers));
+            } else {
+              if (onlineUsers.indexOf(user.email) !== -1) {
+                onlineUsers = onlineUsers.filter((elem) => {
+                  if (elem === user.email) {
+                    return false;
+                  }
+                  return true;
+                });
+                fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify(onlineUsers));
+                req.session.destroy();
+                return callback('log both out', null);
+              }
+              req.session.email = user.email;
+              onlineUsers.push(user.email);
+              fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify(onlineUsers));
+            }
+          } else if (onlineUsers.indexOf(user.email) > -1) {
+            onlineUsers = onlineUsers.filter((elem) => {
+              if (elem === user.email) {
+                return false;
+              }
+              return true;
+            });
+            fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify(onlineUsers));
+            return callback('log both out', null);
+          } else {
+            req.session.email = user.email;
+            onlineUsers.push(user.email);
+            fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify(onlineUsers));
+          }
+
+          fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify(onlineUsers));
           return callback(null, user);
         });
       } else if (loginData.provider === 'facebook') {
@@ -154,6 +210,15 @@ router.post('/login', (req, res) => {
 });
 
 router.get('/logout', (req, res) => {
+  let onlineUsers = JSON.parse(fs.readFileSync('./sessions/onlineUsers.json'));
+  onlineUsers = onlineUsers.filter((email) => {
+    if (email === req.session.email) {
+      return false;
+    }
+    return true;
+  });
+  fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify(onlineUsers));
+  req.session.destroy();
   res.json({
     success: true,
   });
