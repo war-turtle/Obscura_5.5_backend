@@ -483,14 +483,12 @@ router.post('/:alias', (req, res) => {
 
     // getting next level alias
     (data, callback) => {
-      console.log(data);
       levelController.getLevelAlias(data.newLevelNo, data.newSubLevelNo, (err, level) => {
         if (err) {
           return callback(err, null);
         }
         if (level) {
           if (level.sub_levels.length) {
-            console.log(req.user.team_id, data.newLevelOpen, level.sub_levels[0].url_alias);
             if (data.newLevelOpen) {
               global.socket.to(req.user.team_id).emit('openNextLevel', level.sub_levels[0].url_alias);
             }

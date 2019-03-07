@@ -8,18 +8,9 @@ import EmptyContentMiddleware from './global/middlewares/EmptyContent';
 import ContentTypeMiddleware from './global/middlewares/ContentType';
 import configServer from '../config';
 import { stream } from '../log';
-// const cron = require('node-cron');
 
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
-// const fs = require('fs');
-
-// fs.writeFileSync('./sessions/onlineUsers.json', JSON.stringify([]));
-// const JsonStore = require('express-session-json')(expressSession);
-// const session = require('express-session');
-// const MongoStore = require('connect-mongo')(session);
-
-// const store = new MongoStore({ url: configServer.db.url });
 
 const middleware = (app) => {
   app.set('port', process.env.PORT || configServer.app.PORT);
@@ -35,7 +26,7 @@ const middleware = (app) => {
   app.enable('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
 
   app.use(cors({
-    origin: 'http://www.obscuranitkkr.co.in',
+    origin: process.env.NODE_ENV === 'dev' ? 'http://localhost:3000' : 'http://www.obscuranitkkr.co.in',
     credentials: true,
   }));
 
@@ -46,21 +37,6 @@ const middleware = (app) => {
     store: new FileStore({ path: './sessions' }),
     saveUninitialized: false,
   }));
-
-  // global.store = store;
-  // store.clear((err) => {
-  //   if (err) {
-  //     console.log(err);
-  //   }
-  // });
-
-  // cron.schedule('*/30 * * * *', () => {
-  //   store.clear((err) => {
-  //     if (err) {
-  //       console.log(err);
-  //     }
-  //   });
-  // });
 
   app.use(bodyParser.urlencoded({
     extended: false,
