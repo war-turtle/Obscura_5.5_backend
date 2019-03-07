@@ -57,7 +57,7 @@ router.get('/', (req, res) => {
 
         const s = JSON.parse(JSON.stringify(subLevel));
         delete s.ans;
-        return callback(null, s);
+        return callback(null, levelController.encryptLevel(s));
       });
     },
   ];

@@ -27,6 +27,7 @@
     "connect-mongo": "^2.0.1",
     "connect-redis": "^3.4.0",
     "cors": "^2.8.4",
+    "crypto-json": "^2.0.2",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-bundle": "^2.0.4",
     "eslint-plugin-import": "^2.13.0",

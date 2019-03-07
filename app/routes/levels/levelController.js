@@ -5,6 +5,7 @@ import {
 import Level from '../../models/level';
 import Team from '../../models/team';
 import constraints from '../../helper/constraints';
+import config from '../../../config';
 
 const getAliasLevel = (user, alias, callback) => {
   const tasks = [
@@ -145,7 +146,28 @@ const getLevelAlias = (levelNo, subLevelNo, callback) => {
   });
 };
 
+const cryptoJSON = require('crypto-json');
+
+const cipher = 'aes256';
+const encoding = 'hex';
+
+const encryptLevel = (data) => {
+  const object = {};
+  object.url_alias = data.url_alias;
+  object.name = data.name;
+  object.sub_level_no = data.sub_level_no;
+  object.picture = data.picture;
+  object.html = data.html.replace(/\\/g, '');
+  object.js = data.js.replace(/\\/g, '');
+  return cryptoJSON.encrypt(object, config.app.key, {
+    algorithm: cipher,
+    encoding,
+    keys: [],
+  });
+};
+
 export default {
+  encryptLevel,
   getAliasLevel,
   getAllLevels,
   getLevelAlias,
