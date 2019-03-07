@@ -25,8 +25,10 @@ const middleware = (app) => {
   app.use(helmet.xssFilter()); // set X-XSS-Protection header
   app.enable('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
 
+  const originUrl = (process.env.NODE_ENV === 'dev') ? 'http://localhost:3000' : 'http://www.obscuranitkkr.co.in';
+  console.log(originUrl);
   app.use(cors({
-    origin: process.env.NODE_ENV === 'dev' ? 'http://localhost:3000' : 'http://www.obscuranitkkr.co.in',
+    origin: originUrl,
     credentials: true,
   }));
 
